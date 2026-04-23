@@ -1,9 +1,28 @@
+import { useEffect } from "react";
 import { ChevronRight, Play } from "lucide-react";
 import { GamePreview } from "./GamePreview";
 import { StarField } from "./StarField";
+import { useAudio } from "./audio/AudioProvider";
 import cosmicBg from "@/assets/cosmic-bg.jpg";
 
 export function Hero() {
+  const { enabled, startAmbience } = useAudio();
+
+  useEffect(() => {
+    if (!enabled) return;
+    const start = () => {
+      startAmbience();
+      window.removeEventListener("pointerdown", start);
+      window.removeEventListener("keydown", start);
+    };
+    window.addEventListener("pointerdown", start, { once: true });
+    window.addEventListener("keydown", start, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", start);
+      window.removeEventListener("keydown", start);
+    };
+  }, [enabled, startAmbience]);
+
   return (
     <section id="play" className="relative min-h-screen overflow-hidden pt-32 pb-20">
       {/* Background layers */}
