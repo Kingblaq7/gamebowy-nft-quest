@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { ChevronRight, Play } from "lucide-react";
 import { GamePreview } from "./GamePreview";
 import { StarField } from "./StarField";
+import { useAudio } from "./audio/AudioProvider";
 import cosmicBg from "@/assets/cosmic-bg.jpg";
 
 export function Hero() {
