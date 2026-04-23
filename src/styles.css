@@ -215,3 +215,38 @@
 @utility tile-drop {
   animation: drop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* Cosmic range slider */
+.cosmic-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  outline: none;
+  cursor: pointer;
+}
+.cosmic-slider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.cosmic-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: oklch(0.97 0.02 290);
+  border: 2px solid oklch(0.72 0.25 320);
+  box-shadow: 0 0 12px var(--glow);
+  cursor: pointer;
+}
+.cosmic-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: oklch(0.97 0.02 290);
+  border: 2px solid oklch(0.72 0.25 320);
+  box-shadow: 0 0 12px var(--glow);
+  cursor: pointer;
+}
