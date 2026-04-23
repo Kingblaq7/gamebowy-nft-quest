@@ -180,7 +180,7 @@ export function GamePreview() {
         );
       }, 500)
     );
-  }, [tick]);
+  }, [tick, playMatch, playPowerup]);
 
   // refill moves so demo never ends
   useEffect(() => {
