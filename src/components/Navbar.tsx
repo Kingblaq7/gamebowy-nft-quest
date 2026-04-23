@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
+import { SoundControl } from "./audio/SoundControl";
 
 export function Navbar() {
   return (
@@ -19,12 +20,15 @@ export function Navbar() {
           <a href="#features" className="transition-colors hover:text-foreground">Features</a>
           <a href="#roadmap" className="transition-colors hover:text-foreground">Roadmap</a>
         </nav>
-        <a
-          href="#play"
-          className="rounded-full bg-gradient-aurora px-5 py-2 text-sm font-semibold text-background transition-transform hover:scale-105"
-        >
-          Launch Demo
-        </a>
+        <div className="flex items-center gap-3">
+          <SoundControl />
+          <a
+            href="#play"
+            className="rounded-full bg-gradient-aurora px-5 py-2 text-sm font-semibold text-background transition-transform hover:scale-105"
+          >
+            Launch Demo
+          </a>
+        </div>
       </div>
     </header>
   );
