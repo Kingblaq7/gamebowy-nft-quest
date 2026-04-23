@@ -14,7 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      level_progress: {
+        Row: {
+          best_score: number
+          chapter_num: number
+          completed: boolean
+          id: string
+          last_played_at: string
+          level_num: number
+          player_id: string
+          plays: number
+          stars: number
+        }
+        Insert: {
+          best_score?: number
+          chapter_num: number
+          completed?: boolean
+          id?: string
+          last_played_at?: string
+          level_num: number
+          player_id: string
+          plays?: number
+          stars?: number
+        }
+        Update: {
+          best_score?: number
+          chapter_num?: number
+          completed?: boolean
+          id?: string
+          last_played_at?: string
+          level_num?: number
+          player_id?: string
+          plays?: number
+          stars?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "level_progress_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      players: {
+        Row: {
+          created_at: string
+          display_name: string
+          gb_tokens: number
+          id: string
+          total_score: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string
+          gb_tokens?: number
+          id: string
+          total_score?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          gb_tokens?: number
+          id?: string
+          total_score?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
