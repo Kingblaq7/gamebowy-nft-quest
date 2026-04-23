@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useAudio } from "./audio/AudioProvider";
 import tileCrystal from "@/assets/tile-crystal.png";
 import tileOrb from "@/assets/tile-orb.png";
 import tileStar from "@/assets/tile-star.png";
