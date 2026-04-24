@@ -1,8 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { SoundControl } from "./audio/SoundControl";
+import { PlayButton } from "@/web3/PlayButton";
+import { useWallet, shortAddr } from "@/web3/WalletProvider";
 
 export function Navbar() {
+  const w = useWallet();
   return (
     <header className="fixed top-0 z-50 w-full">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
@@ -22,12 +25,23 @@ export function Navbar() {
         </nav>
         <div className="flex items-center gap-3">
           <SoundControl />
-          <Link
+          {w.address && (
+            <span
+              className="hidden items-center gap-1.5 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-xs font-mono backdrop-blur sm:inline-flex"
+              title={w.paid ? "Wallet unlocked" : "Wallet connected"}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${w.paid ? "bg-aurora" : "bg-stardust"}`}
+              />
+              {shortAddr(w.address)}
+            </span>
+          )}
+          <PlayButton
             to="/play"
             className="rounded-full bg-gradient-aurora px-5 py-2 text-sm font-semibold text-background transition-transform hover:scale-105"
           >
             Play Game
-          </Link>
+          </PlayButton>
         </div>
       </div>
     </header>
