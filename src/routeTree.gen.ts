@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
+import { Route as ApiVerifyTransactionRouteImport } from './routes/api/verify-transaction'
 import { Route as PlayChapterLevelRouteImport } from './routes/play.$chapter.$level'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const PlayIndexRoute = PlayIndexRouteImport.update({
   path: '/play/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVerifyTransactionRoute = ApiVerifyTransactionRouteImport.update({
+  id: '/api/verify-transaction',
+  path: '/api/verify-transaction',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlayChapterLevelRoute = PlayChapterLevelRouteImport.update({
   id: '/play/$chapter/$level',
   path: '/play/$chapter/$level',
@@ -31,30 +37,43 @@ const PlayChapterLevelRoute = PlayChapterLevelRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play': typeof PlayIndexRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/play/' | '/play/$chapter/$level'
+  fullPaths:
+    | '/'
+    | '/api/verify-transaction'
+    | '/play/'
+    | '/play/$chapter/$level'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/play' | '/play/$chapter/$level'
-  id: '__root__' | '/' | '/play/' | '/play/$chapter/$level'
+  to: '/' | '/api/verify-transaction' | '/play' | '/play/$chapter/$level'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/verify-transaction'
+    | '/play/'
+    | '/play/$chapter/$level'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiVerifyTransactionRoute: typeof ApiVerifyTransactionRoute
   PlayIndexRoute: typeof PlayIndexRoute
   PlayChapterLevelRoute: typeof PlayChapterLevelRoute
 }
@@ -75,6 +94,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/verify-transaction': {
+      id: '/api/verify-transaction'
+      path: '/api/verify-transaction'
+      fullPath: '/api/verify-transaction'
+      preLoaderRoute: typeof ApiVerifyTransactionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/play/$chapter/$level': {
       id: '/play/$chapter/$level'
       path: '/play/$chapter/$level'
@@ -87,9 +113,19 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiVerifyTransactionRoute: ApiVerifyTransactionRoute,
   PlayIndexRoute: PlayIndexRoute,
   PlayChapterLevelRoute: PlayChapterLevelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
