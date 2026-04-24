@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { Link } from "@tanstack/react-router";
 import { ChevronRight, Play } from "lucide-react";
 import { GamePreview } from "./GamePreview";
 import { StarField } from "./StarField";
 import { useAudio } from "./audio/AudioProvider";
+import { PlayButton } from "@/web3/PlayButton";
 import cosmicBg from "@/assets/cosmic-bg.jpg";
 
 export function Hero() {
@@ -68,13 +68,13 @@ export function Hero() {
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row lg:items-start lg:justify-start">
-            <Link
+            <PlayButton
               to="/play"
               className="group inline-flex items-center gap-2 rounded-full bg-gradient-aurora px-7 py-3.5 text-base font-bold text-background transition-transform hover:scale-105 glow-primary"
             >
               <Play className="h-4 w-4 fill-current" />
               Play Game
-            </Link>
+            </PlayButton>
             <a
               href="#chapters"
               className="group inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-7 py-3.5 text-base font-semibold backdrop-blur transition-colors hover:bg-card/70"
