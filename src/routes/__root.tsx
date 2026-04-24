@@ -1,6 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { AudioProvider } from "@/components/audio/AudioProvider";
-import { WalletProvider } from "@/web3/WalletProvider";
 
 import appCss from "../styles.css?url";
 
@@ -32,13 +31,17 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { name: "description", content: "Game Bowy is a Web3 match-three puzzle game featuring collectible NFTs and token rewards." },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:description", content: "Game Bowy is a Web3 match-three puzzle game featuring collectible NFTs and token rewards." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Lovable App" },
+      { name: "twitter:description", content: "Game Bowy is a Web3 match-three puzzle game featuring collectible NFTs and token rewards." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/pouYPSvJJfeAsvO1iYnRMLE2CPx1/social-images/social-1776998018866-97995.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/pouYPSvJJfeAsvO1iYnRMLE2CPx1/social-images/social-1776998018866-97995.webp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -71,10 +74,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <WalletProvider>
-      <AudioProvider>
-        <Outlet />
-      </AudioProvider>
-    </WalletProvider>
+    <AudioProvider>
+      <Outlet />
+    </AudioProvider>
   );
 }
