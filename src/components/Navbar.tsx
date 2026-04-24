@@ -15,19 +15,19 @@ export function Navbar() {
           </span>
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-          <a href="#play" className="transition-colors hover:text-foreground">Play</a>
+          <Link to="/play" className="transition-colors hover:text-foreground">Play</Link>
           <a href="#chapters" className="transition-colors hover:text-foreground">Chapters</a>
           <a href="#features" className="transition-colors hover:text-foreground">Features</a>
           <a href="#roadmap" className="transition-colors hover:text-foreground">Roadmap</a>
         </nav>
         <div className="flex items-center gap-3">
           <SoundControl />
-          <a
-            href="#play"
+          <Link
+            to="/play"
             className="rounded-full bg-gradient-aurora px-5 py-2 text-sm font-semibold text-background transition-transform hover:scale-105"
           >
-            Launch Demo
-          </a>
+            Play Game
+          </Link>
         </div>
       </div>
     </header>
