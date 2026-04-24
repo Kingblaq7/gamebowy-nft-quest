@@ -58,6 +58,30 @@ export type Database = {
           },
         ]
       }
+      paid_wallets: {
+        Row: {
+          amount_wei: string
+          chain_id: number
+          paid_at: string
+          tx_hash: string
+          wallet_address: string
+        }
+        Insert: {
+          amount_wei: string
+          chain_id: number
+          paid_at?: string
+          tx_hash: string
+          wallet_address: string
+        }
+        Update: {
+          amount_wei?: string
+          chain_id?: number
+          paid_at?: string
+          tx_hash?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       players: {
         Row: {
           created_at: string
