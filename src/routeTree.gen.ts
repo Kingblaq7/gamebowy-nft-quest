@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as ApiVerifyTransactionRouteImport } from './routes/api/verify-transaction'
+import { Route as ApiReferralsRouteImport } from './routes/api/referrals'
+import { Route as ApiProfileRouteImport } from './routes/api/profile'
+import { Route as ApiClaimStreakRouteImport } from './routes/api/claim-streak'
 import { Route as ApiCheckAccessRouteImport } from './routes/api/check-access'
 import { Route as PlayChapterLevelRouteImport } from './routes/play.$chapter.$level'
 
@@ -30,6 +33,21 @@ const ApiVerifyTransactionRoute = ApiVerifyTransactionRouteImport.update({
   path: '/api/verify-transaction',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiReferralsRoute = ApiReferralsRouteImport.update({
+  id: '/api/referrals',
+  path: '/api/referrals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProfileRoute = ApiProfileRouteImport.update({
+  id: '/api/profile',
+  path: '/api/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiClaimStreakRoute = ApiClaimStreakRouteImport.update({
+  id: '/api/claim-streak',
+  path: '/api/claim-streak',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCheckAccessRoute = ApiCheckAccessRouteImport.update({
   id: '/api/check-access',
   path: '/api/check-access',
@@ -44,6 +62,9 @@ const PlayChapterLevelRoute = PlayChapterLevelRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/check-access': typeof ApiCheckAccessRoute
+  '/api/claim-streak': typeof ApiClaimStreakRoute
+  '/api/profile': typeof ApiProfileRoute
+  '/api/referrals': typeof ApiReferralsRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
@@ -51,6 +72,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/check-access': typeof ApiCheckAccessRoute
+  '/api/claim-streak': typeof ApiClaimStreakRoute
+  '/api/profile': typeof ApiProfileRoute
+  '/api/referrals': typeof ApiReferralsRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play': typeof PlayIndexRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
@@ -59,6 +83,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/check-access': typeof ApiCheckAccessRoute
+  '/api/claim-streak': typeof ApiClaimStreakRoute
+  '/api/profile': typeof ApiProfileRoute
+  '/api/referrals': typeof ApiReferralsRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
@@ -68,6 +95,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/api/check-access'
+    | '/api/claim-streak'
+    | '/api/profile'
+    | '/api/referrals'
     | '/api/verify-transaction'
     | '/play/'
     | '/play/$chapter/$level'
@@ -75,6 +105,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/api/check-access'
+    | '/api/claim-streak'
+    | '/api/profile'
+    | '/api/referrals'
     | '/api/verify-transaction'
     | '/play'
     | '/play/$chapter/$level'
@@ -82,6 +115,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/api/check-access'
+    | '/api/claim-streak'
+    | '/api/profile'
+    | '/api/referrals'
     | '/api/verify-transaction'
     | '/play/'
     | '/play/$chapter/$level'
@@ -90,6 +126,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiCheckAccessRoute: typeof ApiCheckAccessRoute
+  ApiClaimStreakRoute: typeof ApiClaimStreakRoute
+  ApiProfileRoute: typeof ApiProfileRoute
+  ApiReferralsRoute: typeof ApiReferralsRoute
   ApiVerifyTransactionRoute: typeof ApiVerifyTransactionRoute
   PlayIndexRoute: typeof PlayIndexRoute
   PlayChapterLevelRoute: typeof PlayChapterLevelRoute
@@ -118,6 +157,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiVerifyTransactionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/referrals': {
+      id: '/api/referrals'
+      path: '/api/referrals'
+      fullPath: '/api/referrals'
+      preLoaderRoute: typeof ApiReferralsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/profile': {
+      id: '/api/profile'
+      path: '/api/profile'
+      fullPath: '/api/profile'
+      preLoaderRoute: typeof ApiProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/claim-streak': {
+      id: '/api/claim-streak'
+      path: '/api/claim-streak'
+      fullPath: '/api/claim-streak'
+      preLoaderRoute: typeof ApiClaimStreakRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/check-access': {
       id: '/api/check-access'
       path: '/api/check-access'
@@ -138,6 +198,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiCheckAccessRoute: ApiCheckAccessRoute,
+  ApiClaimStreakRoute: ApiClaimStreakRoute,
+  ApiProfileRoute: ApiProfileRoute,
+  ApiReferralsRoute: ApiReferralsRoute,
   ApiVerifyTransactionRoute: ApiVerifyTransactionRoute,
   PlayIndexRoute: PlayIndexRoute,
   PlayChapterLevelRoute: PlayChapterLevelRoute,
