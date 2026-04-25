@@ -19,6 +19,7 @@ export function Navbar() {
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           <Link to="/play" className="transition-colors hover:text-foreground">Play</Link>
+          <Link to="/profile" className="transition-colors hover:text-foreground">Profile</Link>
           <a href="#chapters" className="transition-colors hover:text-foreground">Chapters</a>
           <a href="#features" className="transition-colors hover:text-foreground">Features</a>
           <a href="#roadmap" className="transition-colors hover:text-foreground">Roadmap</a>
@@ -26,8 +27,9 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <SoundControl />
           {w.address && (
-            <span
-              className="hidden items-center gap-1.5 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-xs font-mono backdrop-blur sm:inline-flex"
+            <Link
+              to="/profile"
+              className="hidden items-center gap-1.5 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-xs font-mono backdrop-blur transition-colors hover:bg-card/70 sm:inline-flex"
               title={
                 w.isAdmin
                   ? "Admin wallet — free access"
@@ -44,7 +46,7 @@ export function Navbar() {
                 />
               )}
               {shortAddr(w.address)}
-            </span>
+            </Link>
           )}
           <PlayButton
             to="/play"
