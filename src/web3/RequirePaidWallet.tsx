@@ -18,7 +18,7 @@ export function RequirePaidWallet({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     (async () => {
       if (w.address) {
-        await w.checkPaidStatus();
+        await Promise.all([w.checkPaidStatus(), w.checkRole()]);
       }
       if (!cancelled) setChecking(false);
     })();
@@ -29,10 +29,10 @@ export function RequirePaidWallet({ children }: { children: React.ReactNode }) {
   }, [w.address]);
 
   useEffect(() => {
-    if (!checking && !w.paid) setOpen(true);
-  }, [checking, w.paid]);
+    if (!checking && !w.hasAccess) setOpen(true);
+  }, [checking, w.hasAccess]);
 
-  if (w.paid) return <>{children}</>;
+  if (w.hasAccess) return <>{children}</>;
 
   return (
     <>
