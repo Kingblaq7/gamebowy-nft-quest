@@ -34,11 +34,17 @@ declare global {
 
 export type WalletKind = "metamask" | "rabby";
 
+export type WalletRole = "admin" | "user";
+
 export type WalletState = {
   address: string | null;
   chainId: number | null;
   balanceAbey: string | null;
   paid: boolean;
+  role: WalletRole;
+  isAdmin: boolean;
+  /** True if the wallet can enter the game (paid OR admin). */
+  hasAccess: boolean;
   connecting: boolean;
   paying: boolean;
   error: string | null;
@@ -52,6 +58,7 @@ type Ctx = WalletState & {
   refreshBalance: () => Promise<void>;
   payToPlay: () => Promise<{ ok: true } | { ok: false; reason: string }>;
   checkPaidStatus: (address?: string) => Promise<boolean>;
+  checkRole: (address?: string) => Promise<WalletRole>;
 };
 
 const WalletContext = createContext<Ctx | null>(null);
@@ -79,6 +86,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [chainId, setChainId] = useState<number | null>(null);
   const [balanceAbey, setBalanceAbey] = useState<string | null>(null);
   const [paid, setPaid] = useState(false);
+  const [role, setRole] = useState<WalletRole>("user");
   const [connecting, setConnecting] = useState(false);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
