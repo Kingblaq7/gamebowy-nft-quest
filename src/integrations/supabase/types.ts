@@ -109,6 +109,63 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          created_at: string
+          referee_wallet: string
+          referrer_wallet: string
+          reward_amount: number
+        }
+        Insert: {
+          created_at?: string
+          referee_wallet: string
+          referrer_wallet: string
+          reward_amount?: number
+        }
+        Update: {
+          created_at?: string
+          referee_wallet?: string
+          referrer_wallet?: string
+          reward_amount?: number
+        }
+        Relationships: []
+      }
+      wallet_profiles: {
+        Row: {
+          created_at: string
+          gb_balance: number
+          last_claim_date: string | null
+          referral_rewards: number
+          referred_by: string | null
+          streak: number
+          total_referrals: number
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          gb_balance?: number
+          last_claim_date?: string | null
+          referral_rewards?: number
+          referred_by?: string | null
+          streak?: number
+          total_referrals?: number
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string
+          gb_balance?: number
+          last_claim_date?: string | null
+          referral_rewards?: number
+          referred_by?: string | null
+          streak?: number
+          total_referrals?: number
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

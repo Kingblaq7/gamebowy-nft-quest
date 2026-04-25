@@ -65,6 +65,38 @@ const WalletContext = createContext<Ctx | null>(null);
 
 const LS_ADDR = "gb_wallet_addr";
 const LS_KIND = "gb_wallet_kind";
+const LS_REF = "gb_referrer";
+
+/** Read ?ref=<wallet> from the current URL and persist it (so it survives navigation). */
+function captureReferralFromURL(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const url = new URL(window.location.href);
+    const ref = url.searchParams.get("ref");
+    if (ref && /^0x[a-fA-F0-9]{40}$/.test(ref)) {
+      const norm = ref.toLowerCase();
+      localStorage.setItem(LS_REF, norm);
+      return norm;
+    }
+  } catch {
+    // ignore
+  }
+  return localStorage.getItem(LS_REF);
+}
+
+/** Notify backend a wallet has connected; also applies any captured referral. */
+async function ensureProfileOnServer(wallet: string): Promise<void> {
+  try {
+    const ref = captureReferralFromURL();
+    await fetch("/api/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ walletAddress: wallet, ref: ref ?? undefined }),
+    });
+  } catch (e) {
+    console.warn("[wallet] ensureProfileOnServer failed", e);
+  }
+}
 
 function pickProvider(kind: WalletKind): Eip1193Provider | null {
   if (typeof window === "undefined" || !window.ethereum) return null;
@@ -215,7 +247,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const cid = (await eip.request({ method: "eth_chainId" })) as string;
       setChainId(parseInt(cid, 16));
 
-      await Promise.all([checkPaidStatus(addr), checkRole(addr)]);
+      await Promise.all([
+        checkPaidStatus(addr),
+        checkRole(addr),
+        ensureProfileOnServer(addr),
+      ]);
       return true;
     } catch (e) {
       const msg = (e as Error)?.message || "Connection rejected";
@@ -314,7 +350,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setAddress(accounts[0]);
           const cid = (await eip.request({ method: "eth_chainId" })) as string;
           setChainId(parseInt(cid, 16));
-          await Promise.all([checkPaidStatus(accounts[0]), checkRole(accounts[0])]);
+          await Promise.all([
+            checkPaidStatus(accounts[0]),
+            checkRole(accounts[0]),
+            ensureProfileOnServer(accounts[0]),
+          ]);
         } else {
           localStorage.removeItem(LS_ADDR);
           localStorage.removeItem(LS_KIND);
@@ -339,6 +379,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(LS_ADDR, accounts[0]);
         void checkPaidStatus(accounts[0]);
         void checkRole(accounts[0]);
+        void ensureProfileOnServer(accounts[0]);
       }
     };
     const onChainChanged = (...args: unknown[]) => {
