@@ -17,7 +17,7 @@ export function WalletGateModal({ open, onClose, onUnlocked }: Props) {
   // Advance steps based on wallet state
   useEffect(() => {
     if (!open) return;
-    if (w.paid) {
+    if (w.paid || w.isAdmin) {
       setStep("done");
       onUnlocked?.();
       return;
@@ -36,7 +36,7 @@ export function WalletGateModal({ open, onClose, onUnlocked }: Props) {
       return;
     }
     setStep("pay");
-  }, [open, w.paid, w.address, w.chainId, w.balanceAbey, onUnlocked]);
+  }, [open, w.paid, w.isAdmin, w.address, w.chainId, w.balanceAbey, onUnlocked]);
 
   if (!open) return null;
 
@@ -198,8 +198,14 @@ export function WalletGateModal({ open, onClose, onUnlocked }: Props) {
           {step === "done" && (
             <div className="rounded-2xl border border-aurora/40 bg-aurora/10 p-4 text-center text-sm">
               <ShieldCheck className="mx-auto mb-2 h-6 w-6 text-aurora" />
-              <div className="font-bold">Wallet unlocked</div>
-              <p className="mt-1 text-xs text-muted-foreground">You can now enter the galaxy.</p>
+              <div className="font-bold">
+                {w.isAdmin ? "👑 Admin access granted" : "Wallet unlocked"}
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {w.isAdmin
+                  ? "No payment required. You can enter the galaxy."
+                  : "You can now enter the galaxy."}
+              </p>
               <button
                 onClick={onClose}
                 className="mt-3 inline-block rounded-full bg-gradient-aurora px-5 py-2 text-xs font-bold text-background"
