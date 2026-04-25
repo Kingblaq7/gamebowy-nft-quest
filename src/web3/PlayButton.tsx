@@ -19,17 +19,25 @@ export function PlayButton({ to = "/play", className, children, navigateOnUnlock
 
   const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    // If we have an address but haven't checked DB this session, do a quick check
-    if (w.address && !w.paid) {
-      const isPaid = await w.checkPaidStatus();
-      if (isPaid) {
-        navigate({ to });
-        return;
-      }
+    // If admin already known, go straight in
+    if (w.isAdmin) {
+      navigate({ to });
+      return;
     }
     if (w.paid) {
       navigate({ to });
       return;
+    }
+    // If we have an address but haven't confirmed access, check role + paid status
+    if (w.address) {
+      const [role, isPaid] = await Promise.all([
+        w.checkRole(),
+        w.checkPaidStatus(),
+      ]);
+      if (role === "admin" || isPaid) {
+        navigate({ to });
+        return;
+      }
     }
     setOpen(true);
   };

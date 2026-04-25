@@ -28,11 +28,21 @@ export function Navbar() {
           {w.address && (
             <span
               className="hidden items-center gap-1.5 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-xs font-mono backdrop-blur sm:inline-flex"
-              title={w.paid ? "Wallet unlocked" : "Wallet connected"}
+              title={
+                w.isAdmin
+                  ? "Admin wallet — free access"
+                  : w.paid
+                  ? "Wallet unlocked"
+                  : "Wallet connected"
+              }
             >
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${w.paid ? "bg-aurora" : "bg-stardust"}`}
-              />
+              {w.isAdmin ? (
+                <span aria-label="Admin" className="text-sm leading-none">👑</span>
+              ) : (
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${w.paid ? "bg-aurora" : "bg-stardust"}`}
+                />
+              )}
               {shortAddr(w.address)}
             </span>
           )}

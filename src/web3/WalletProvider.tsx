@@ -34,11 +34,17 @@ declare global {
 
 export type WalletKind = "metamask" | "rabby";
 
+export type WalletRole = "admin" | "user";
+
 export type WalletState = {
   address: string | null;
   chainId: number | null;
   balanceAbey: string | null;
   paid: boolean;
+  role: WalletRole;
+  isAdmin: boolean;
+  /** True if the wallet can enter the game (paid OR admin). */
+  hasAccess: boolean;
   connecting: boolean;
   paying: boolean;
   error: string | null;
@@ -52,6 +58,7 @@ type Ctx = WalletState & {
   refreshBalance: () => Promise<void>;
   payToPlay: () => Promise<{ ok: true } | { ok: false; reason: string }>;
   checkPaidStatus: (address?: string) => Promise<boolean>;
+  checkRole: (address?: string) => Promise<WalletRole>;
 };
 
 const WalletContext = createContext<Ctx | null>(null);
@@ -79,6 +86,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [chainId, setChainId] = useState<number | null>(null);
   const [balanceAbey, setBalanceAbey] = useState<string | null>(null);
   const [paid, setPaid] = useState(false);
+  const [role, setRole] = useState<WalletRole>("user");
   const [connecting, setConnecting] = useState(false);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +117,26 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       console.warn("[wallet] paid status check threw", e);
       return false;
+    }
+  }, [address]);
+
+  const checkRole = useCallback(async (addr?: string): Promise<WalletRole> => {
+    const a = (addr ?? address)?.toLowerCase();
+    if (!a) return "user";
+    try {
+      const res = await fetch("/api/check-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: a }),
+      });
+      const json = (await res.json().catch(() => ({}))) as { role?: WalletRole };
+      const r: WalletRole = json.role === "admin" ? "admin" : "user";
+      setRole(r);
+      return r;
+    } catch (e) {
+      console.warn("[wallet] role check failed", e);
+      setRole("user");
+      return "user";
     }
   }, [address]);
 
@@ -187,7 +215,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const cid = (await eip.request({ method: "eth_chainId" })) as string;
       setChainId(parseInt(cid, 16));
 
-      await checkPaidStatus(addr);
+      await Promise.all([checkPaidStatus(addr), checkRole(addr)]);
       return true;
     } catch (e) {
       const msg = (e as Error)?.message || "Connection rejected";
@@ -196,7 +224,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     } finally {
       setConnecting(false);
     }
-  }, [checkPaidStatus]);
+  }, [checkPaidStatus, checkRole]);
 
   const disconnect = useCallback(() => {
     setAddress(null);
@@ -204,6 +232,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setChainId(null);
     setBalanceAbey(null);
     setPaid(false);
+    setRole("user");
     setError(null);
     localStorage.removeItem(LS_ADDR);
     localStorage.removeItem(LS_KIND);
@@ -285,7 +314,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setAddress(accounts[0]);
           const cid = (await eip.request({ method: "eth_chainId" })) as string;
           setChainId(parseInt(cid, 16));
-          await checkPaidStatus(accounts[0]);
+          await Promise.all([checkPaidStatus(accounts[0]), checkRole(accounts[0])]);
         } else {
           localStorage.removeItem(LS_ADDR);
           localStorage.removeItem(LS_KIND);
@@ -309,6 +338,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setAddress(accounts[0]);
         localStorage.setItem(LS_ADDR, accounts[0]);
         void checkPaidStatus(accounts[0]);
+        void checkRole(accounts[0]);
       }
     };
     const onChainChanged = (...args: unknown[]) => {
@@ -322,12 +352,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       eip.removeListener?.("accountsChanged", onAccountsChanged);
       eip.removeListener?.("chainChanged", onChainChanged);
     };
-  }, [getEip, disconnect, checkPaidStatus, refreshBalance]);
+  }, [getEip, disconnect, checkPaidStatus, checkRole, refreshBalance]);
 
   // Auto-refresh balance when address/chain changes
   useEffect(() => {
     if (address && chainId === ABEY_CHAIN_ID_DEC) void refreshBalance();
   }, [address, chainId, refreshBalance]);
+
+  const isAdmin = role === "admin";
+  const hasAccess = paid || isAdmin;
 
   const value = useMemo<Ctx>(
     () => ({
@@ -335,6 +368,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       chainId,
       balanceAbey,
       paid,
+      role,
+      isAdmin,
+      hasAccess,
       connecting,
       paying,
       error,
@@ -345,8 +381,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       refreshBalance,
       payToPlay,
       checkPaidStatus,
+      checkRole,
     }),
-    [address, chainId, balanceAbey, paid, connecting, paying, error, isInstalled, connect, disconnect, ensureAbeyNetwork, refreshBalance, payToPlay, checkPaidStatus]
+    [address, chainId, balanceAbey, paid, role, isAdmin, hasAccess, connecting, paying, error, isInstalled, connect, disconnect, ensureAbeyNetwork, refreshBalance, payToPlay, checkPaidStatus, checkRole]
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
@@ -363,6 +400,9 @@ export function useWallet() {
       chainId: null,
       balanceAbey: null,
       paid: false,
+      role: "user" as const,
+      isAdmin: false,
+      hasAccess: false,
       connecting: false,
       paying: false,
       error: null,
@@ -373,6 +413,7 @@ export function useWallet() {
       refreshBalance: async () => {},
       payToPlay: async () => ({ ok: false as const, reason: "Wallet provider unavailable" }),
       checkPaidStatus: noop,
+      checkRole: async () => "user" as const,
     } as unknown as Ctx;
   }
   return ctx;
