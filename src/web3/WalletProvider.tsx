@@ -247,7 +247,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const cid = (await eip.request({ method: "eth_chainId" })) as string;
       setChainId(parseInt(cid, 16));
 
-      await Promise.all([checkPaidStatus(addr), checkRole(addr)]);
+      await Promise.all([
+        checkPaidStatus(addr),
+        checkRole(addr),
+        ensureProfileOnServer(addr),
+      ]);
       return true;
     } catch (e) {
       const msg = (e as Error)?.message || "Connection rejected";
@@ -346,7 +350,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setAddress(accounts[0]);
           const cid = (await eip.request({ method: "eth_chainId" })) as string;
           setChainId(parseInt(cid, 16));
-          await Promise.all([checkPaidStatus(accounts[0]), checkRole(accounts[0])]);
+          await Promise.all([
+            checkPaidStatus(accounts[0]),
+            checkRole(accounts[0]),
+            ensureProfileOnServer(accounts[0]),
+          ]);
         } else {
           localStorage.removeItem(LS_ADDR);
           localStorage.removeItem(LS_KIND);
@@ -371,6 +379,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(LS_ADDR, accounts[0]);
         void checkPaidStatus(accounts[0]);
         void checkRole(accounts[0]);
+        void ensureProfileOnServer(accounts[0]);
       }
     };
     const onChainChanged = (...args: unknown[]) => {
