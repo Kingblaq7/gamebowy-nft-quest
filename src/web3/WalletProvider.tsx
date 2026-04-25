@@ -215,7 +215,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const cid = (await eip.request({ method: "eth_chainId" })) as string;
       setChainId(parseInt(cid, 16));
 
-      await checkPaidStatus(addr);
+      await Promise.all([checkPaidStatus(addr), checkRole(addr)]);
       return true;
     } catch (e) {
       const msg = (e as Error)?.message || "Connection rejected";
@@ -224,7 +224,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     } finally {
       setConnecting(false);
     }
-  }, [checkPaidStatus]);
+  }, [checkPaidStatus, checkRole]);
 
   const disconnect = useCallback(() => {
     setAddress(null);
@@ -232,6 +232,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setChainId(null);
     setBalanceAbey(null);
     setPaid(false);
+    setRole("user");
     setError(null);
     localStorage.removeItem(LS_ADDR);
     localStorage.removeItem(LS_KIND);
@@ -313,7 +314,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setAddress(accounts[0]);
           const cid = (await eip.request({ method: "eth_chainId" })) as string;
           setChainId(parseInt(cid, 16));
-          await checkPaidStatus(accounts[0]);
+          await Promise.all([checkPaidStatus(accounts[0]), checkRole(accounts[0])]);
         } else {
           localStorage.removeItem(LS_ADDR);
           localStorage.removeItem(LS_KIND);
@@ -337,6 +338,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setAddress(accounts[0]);
         localStorage.setItem(LS_ADDR, accounts[0]);
         void checkPaidStatus(accounts[0]);
+        void checkRole(accounts[0]);
       }
     };
     const onChainChanged = (...args: unknown[]) => {
@@ -350,12 +352,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       eip.removeListener?.("accountsChanged", onAccountsChanged);
       eip.removeListener?.("chainChanged", onChainChanged);
     };
-  }, [getEip, disconnect, checkPaidStatus, refreshBalance]);
+  }, [getEip, disconnect, checkPaidStatus, checkRole, refreshBalance]);
 
   // Auto-refresh balance when address/chain changes
   useEffect(() => {
     if (address && chainId === ABEY_CHAIN_ID_DEC) void refreshBalance();
   }, [address, chainId, refreshBalance]);
+
+  const isAdmin = role === "admin";
+  const hasAccess = paid || isAdmin;
 
   const value = useMemo<Ctx>(
     () => ({
@@ -363,6 +368,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       chainId,
       balanceAbey,
       paid,
+      role,
+      isAdmin,
+      hasAccess,
       connecting,
       paying,
       error,
@@ -373,8 +381,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       refreshBalance,
       payToPlay,
       checkPaidStatus,
+      checkRole,
     }),
-    [address, chainId, balanceAbey, paid, connecting, paying, error, isInstalled, connect, disconnect, ensureAbeyNetwork, refreshBalance, payToPlay, checkPaidStatus]
+    [address, chainId, balanceAbey, paid, role, isAdmin, hasAccess, connecting, paying, error, isInstalled, connect, disconnect, ensureAbeyNetwork, refreshBalance, payToPlay, checkPaidStatus, checkRole]
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
@@ -391,6 +400,9 @@ export function useWallet() {
       chainId: null,
       balanceAbey: null,
       paid: false,
+      role: "user" as const,
+      isAdmin: false,
+      hasAccess: false,
       connecting: false,
       paying: false,
       error: null,
