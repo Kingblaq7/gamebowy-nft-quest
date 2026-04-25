@@ -120,6 +120,26 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, [address]);
 
+  const checkRole = useCallback(async (addr?: string): Promise<WalletRole> => {
+    const a = (addr ?? address)?.toLowerCase();
+    if (!a) return "user";
+    try {
+      const res = await fetch("/api/check-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: a }),
+      });
+      const json = (await res.json().catch(() => ({}))) as { role?: WalletRole };
+      const r: WalletRole = json.role === "admin" ? "admin" : "user";
+      setRole(r);
+      return r;
+    } catch (e) {
+      console.warn("[wallet] role check failed", e);
+      setRole("user");
+      return "user";
+    }
+  }, [address]);
+
   const refreshBalance = useCallback(async () => {
     const eip = getEip();
     if (!eip || !address) return;
