@@ -93,14 +93,23 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const checkPaidStatus = useCallback(async (addr?: string): Promise<boolean> => {
     const a = (addr ?? address)?.toLowerCase();
     if (!a) return false;
-    const { data } = await supabase
-      .from("paid_wallets")
-      .select("wallet_address")
-      .eq("wallet_address", a)
-      .maybeSingle();
-    const isPaid = !!data;
-    setPaid(isPaid);
-    return isPaid;
+    try {
+      const { data, error: dbErr } = await supabase
+        .from("paid_wallets")
+        .select("wallet_address")
+        .eq("wallet_address", a)
+        .maybeSingle();
+      if (dbErr) {
+        console.warn("[wallet] paid status check failed", dbErr);
+        return false;
+      }
+      const isPaid = !!data;
+      setPaid(isPaid);
+      return isPaid;
+    } catch (e) {
+      console.warn("[wallet] paid status check threw", e);
+      return false;
+    }
   }, [address]);
 
   const refreshBalance = useCallback(async () => {
@@ -345,7 +354,27 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
 export function useWallet() {
   const ctx = useContext(WalletContext);
-  if (!ctx) throw new Error("useWallet must be used inside <WalletProvider>");
+  if (!ctx) {
+    // Safe fallback so a missing provider can never crash the UI.
+    console.warn("useWallet used outside <WalletProvider>; returning inert stub.");
+    const noop = async () => false;
+    return {
+      address: null,
+      chainId: null,
+      balanceAbey: null,
+      paid: false,
+      connecting: false,
+      paying: false,
+      error: null,
+      isInstalled: () => false,
+      connect: noop,
+      disconnect: () => {},
+      ensureAbeyNetwork: noop,
+      refreshBalance: async () => {},
+      payToPlay: async () => ({ ok: false as const, reason: "Wallet provider unavailable" }),
+      checkPaidStatus: noop,
+    } as unknown as Ctx;
+  }
   return ctx;
 }
 
