@@ -413,6 +413,7 @@ export function useWallet() {
       refreshBalance: async () => {},
       payToPlay: async () => ({ ok: false as const, reason: "Wallet provider unavailable" }),
       checkPaidStatus: noop,
+      checkRole: async () => "user" as const,
     } as unknown as Ctx;
   }
   return ctx;
