@@ -137,20 +137,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const a = (addr ?? address)?.toLowerCase();
     if (!a) return false;
     try {
-      const { data, error: dbErr } = await supabase
-        .from("paid_wallets")
-        .select("wallet_address")
-        .eq("wallet_address", a)
-        .maybeSingle();
-      if (dbErr) {
-        console.warn("[wallet] paid status check failed", dbErr);
-        return false;
-      }
-      const isPaid = !!data;
-      setPaid(isPaid);
-      return isPaid;
+      // canPlay() returns true for paid wallets AND admins set on the contract.
+      const contract = new Contract(GAMEBOWY_CONTRACT_ADDRESS, GAMEBOWY_ABI, READ_PROVIDER);
+      const canPlay = (await contract.canPlay(a)) as boolean;
+      setPaid(canPlay);
+      return canPlay;
     } catch (e) {
-      console.warn("[wallet] paid status check threw", e);
+      console.warn("[wallet] canPlay() check failed", e);
       return false;
     }
   }, [address]);
