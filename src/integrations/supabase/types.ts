@@ -58,33 +58,6 @@ export type Database = {
           },
         ]
       }
-      levels: {
-        Row: {
-          base_moves: number
-          chapter_num: number
-          combo_bonus: number
-          level_num: number
-          score_target: number
-          updated_at: string
-        }
-        Insert: {
-          base_moves?: number
-          chapter_num: number
-          combo_bonus?: number
-          level_num: number
-          score_target?: number
-          updated_at?: string
-        }
-        Update: {
-          base_moves?: number
-          chapter_num?: number
-          combo_bonus?: number
-          level_num?: number
-          score_target?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
       paid_wallets: {
         Row: {
           amount_wei: string
@@ -160,42 +133,33 @@ export type Database = {
       wallet_profiles: {
         Row: {
           created_at: string
-          game_tokens: number
           gb_balance: number
           last_claim_date: string | null
           referral_rewards: number
-          referral_tokens: number
           referred_by: string | null
           streak: number
-          streak_tokens: number
           total_referrals: number
           updated_at: string
           wallet_address: string
         }
         Insert: {
           created_at?: string
-          game_tokens?: number
           gb_balance?: number
           last_claim_date?: string | null
           referral_rewards?: number
-          referral_tokens?: number
           referred_by?: string | null
           streak?: number
-          streak_tokens?: number
           total_referrals?: number
           updated_at?: string
           wallet_address: string
         }
         Update: {
           created_at?: string
-          game_tokens?: number
           gb_balance?: number
           last_claim_date?: string | null
           referral_rewards?: number
-          referral_tokens?: number
           referred_by?: string | null
           streak?: number
-          streak_tokens?: number
           total_referrals?: number
           updated_at?: string
           wallet_address?: string

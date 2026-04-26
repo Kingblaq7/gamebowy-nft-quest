@@ -86,7 +86,7 @@ export const Route = createFileRoute("/api/profile")({
               // Credit referrer
               const { data: refProfile } = await supabaseAdmin
                 .from("wallet_profiles")
-                .select("gb_balance, total_referrals, referral_rewards, referral_tokens")
+                .select("gb_balance, total_referrals, referral_rewards")
                 .eq("wallet_address", ref)
                 .single();
               if (refProfile) {
@@ -97,8 +97,6 @@ export const Route = createFileRoute("/api/profile")({
                     total_referrals: refProfile.total_referrals + 1,
                     referral_rewards:
                       Number(refProfile.referral_rewards) + REFERRAL_REWARD,
-                    referral_tokens:
-                      Number(refProfile.referral_tokens ?? 0) + REFERRAL_REWARD,
                   })
                   .eq("wallet_address", ref);
               }

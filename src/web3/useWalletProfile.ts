@@ -9,9 +9,6 @@ export type WalletProfile = {
   referred_by: string | null;
   total_referrals: number;
   referral_rewards: number;
-  game_tokens: number;
-  referral_tokens: number;
-  streak_tokens: number;
 };
 
 export type ReferralStats = {

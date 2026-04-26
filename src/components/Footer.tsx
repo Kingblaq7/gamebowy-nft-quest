@@ -1,4 +1,4 @@
-import { Sparkles, Send } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export function Footer() {
   return (
@@ -15,27 +15,10 @@ export function Footer() {
         <p className="text-xs text-muted-foreground">
           © {new Date().getFullYear()} Game Bowy · Match the cosmos
         </p>
-        <div className="flex items-center gap-3">
-          <a
-            href="https://t.me/Gamebowycommunity"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Telegram community"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-card/40 text-muted-foreground backdrop-blur transition-colors hover:bg-card/70 hover:text-foreground"
-          >
-            <Send className="h-4 w-4" />
-          </a>
-          <a
-            href="https://x.com/gamerboyw"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Follow on X"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-card/40 text-muted-foreground backdrop-blur transition-colors hover:bg-card/70 hover:text-foreground"
-          >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
-              <path d="M18.244 2H21l-6.51 7.44L22 22h-6.797l-5.32-6.957L3.8 22H1.04l6.96-7.954L1.5 2h6.93l4.81 6.36L18.244 2Zm-1.193 18.4h1.882L7.04 3.5H5.034L17.05 20.4Z" />
-            </svg>
-          </a>
+        <div className="flex gap-6 text-xs text-muted-foreground">
+          <a href="#play" className="transition-colors hover:text-foreground">Play</a>
+          <a href="#chapters" className="transition-colors hover:text-foreground">Chapters</a>
+          <a href="#roadmap" className="transition-colors hover:text-foreground">Roadmap</a>
         </div>
       </div>
     </footer>
