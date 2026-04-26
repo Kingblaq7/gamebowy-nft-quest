@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createSupabaseServer } from "@/integrations/supabase/client.server";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export const Route = createFileRoute("/api/award-game-tokens")({
   server: {
