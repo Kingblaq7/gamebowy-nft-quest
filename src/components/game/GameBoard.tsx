@@ -107,10 +107,20 @@ export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
   const { playMatch, playSwap, playPowerup } = useAudio();
   const { submitLevel, profile } = usePlayer();
+  const wallet = useWallet();
+
+  // Dynamic level config (moves, combo bonus) sourced from backend, with
+  // chapters.ts as a safe fallback so gameplay never blocks on the network.
+  const { config: levelConfig } = useLevelConfig(chapter.num, level.num, {
+    base_moves: level.moves,
+    combo_bonus: 2,
+    score_target:
+      level.objective.kind === "score" ? level.objective.target : level.starThresholds[0],
+  });
 
   const [board, setBoard] = useState<Board>(() => makeBoard(level.size, level.tilePool));
   const [score, setScore] = useState(0);
-  const [movesLeft, setMovesLeft] = useState(level.moves);
+  const [movesLeft, setMovesLeft] = useState(levelConfig.base_moves);
   const [busy, setBusy] = useState(false);
   const [maxCombo, setMaxCombo] = useState(0);
   const [collected, setCollected] = useState<Record<number, number>>({});
@@ -118,6 +128,14 @@ export function GameBoard({ chapter, level }: Props) {
   const [lastChain, setLastChain] = useState(0);
   const [paused, setPaused] = useState(false);
   const submittedRef = useRef(false);
+
+  // Re-sync starting moves when backend config arrives (only before first swap)
+  useEffect(() => {
+    if (!submittedRef.current && state === "playing" && score === 0) {
+      setMovesLeft(levelConfig.base_moves);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [levelConfig.base_moves]);
 
   // Floating score popups
   const [popups, setPopups] = useState<{ id: number; r: number; c: number; text: string }[]>([]);
