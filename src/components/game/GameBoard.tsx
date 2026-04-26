@@ -367,7 +367,7 @@ export function GameBoard({ chapter, level }: Props) {
     submittedRef.current = false;
     setBoard(makeBoard(level.size, level.tilePool));
     setScore(0);
-    setMovesLeft(level.moves);
+    setMovesLeft(levelConfig.base_moves);
     setMaxCombo(0);
     setCollected({});
     setState("playing");
