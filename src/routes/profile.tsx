@@ -164,6 +164,25 @@ function ProfilePage() {
                 />
               </div>
 
+              {/* Token source breakdown */}
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                <SourceStat
+                  label="Game"
+                  value={(profile?.game_tokens ?? 0).toFixed(2)}
+                  tone="aurora"
+                />
+                <SourceStat
+                  label="Referral"
+                  value={(profile?.referral_tokens ?? 0).toFixed(2)}
+                  tone="stardust"
+                />
+                <SourceStat
+                  label="Streak"
+                  value={(profile?.streak_tokens ?? 0).toFixed(3)}
+                  tone="accent"
+                />
+              </div>
+
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => setGateOpen(true)}
