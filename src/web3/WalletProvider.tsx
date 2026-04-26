@@ -7,15 +7,18 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { BrowserProvider, formatEther, parseEther } from "ethers";
-import { supabase } from "@/integrations/supabase/client";
+import { BrowserProvider, Contract, JsonRpcProvider, formatEther, parseEther } from "ethers";
 import {
   ABEY_CHAIN_ID_DEC,
   ABEY_CHAIN_ID_HEX,
   ABEY_CHAIN_PARAMS,
-  GAME_TREASURY_ADDRESS,
+  GAMEBOWY_ABI,
+  GAMEBOWY_CONTRACT_ADDRESS,
   REQUIRED_PAYMENT_ABEY,
 } from "./abey";
+
+// Read-only provider for canPlay() checks even before wallet connect.
+const READ_PROVIDER = new JsonRpcProvider(ABEY_CHAIN_PARAMS.rpcUrls[0], ABEY_CHAIN_ID_DEC);
 
 type Eip1193Provider = {
   request: (args: { method: string; params?: unknown[] | object }) => Promise<unknown>;
@@ -134,20 +137,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const a = (addr ?? address)?.toLowerCase();
     if (!a) return false;
     try {
-      const { data, error: dbErr } = await supabase
-        .from("paid_wallets")
-        .select("wallet_address")
-        .eq("wallet_address", a)
-        .maybeSingle();
-      if (dbErr) {
-        console.warn("[wallet] paid status check failed", dbErr);
-        return false;
-      }
-      const isPaid = !!data;
-      setPaid(isPaid);
-      return isPaid;
+      // canPlay() returns true for paid wallets AND admins set on the contract.
+      const contract = new Contract(GAMEBOWY_CONTRACT_ADDRESS, GAMEBOWY_ABI, READ_PROVIDER);
+      const canPlay = (await contract.canPlay(a)) as boolean;
+      setPaid(canPlay);
+      return canPlay;
     } catch (e) {
-      console.warn("[wallet] paid status check threw", e);
+      console.warn("[wallet] canPlay() check failed", e);
       return false;
     }
   }, [address]);
@@ -299,28 +295,48 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setPaying(true);
     try {
       const signer = await provider.getSigner();
-      const tx = await signer.sendTransaction({
-        to: GAME_TREASURY_ADDRESS,
-        value: parseEther(REQUIRED_PAYMENT_ABEY),
-      });
+      const contract = new Contract(GAMEBOWY_CONTRACT_ADDRESS, GAMEBOWY_ABI, signer);
+
+      // Sanity check: if the contract already says canPlay, skip the tx.
+      try {
+        const already = (await contract.canPlay(address)) as boolean;
+        if (already) {
+          setPaid(true);
+          return { ok: true };
+        }
+      } catch {
+        // non-fatal — continue to attempt payment
+      }
+
+      // Read on-chain fee (falls back to constant).
+      let value = parseEther(REQUIRED_PAYMENT_ABEY);
+      try {
+        const feeWei = (await contract.playFee()) as bigint;
+        if (typeof feeWei === "bigint" && feeWei > 0n) value = feeWei;
+      } catch {
+        // ignore — use default
+      }
+
+      const tx = await contract.payToPlay({ value });
       const receipt = await tx.wait();
       if (!receipt || receipt.status !== 1) {
         return { ok: false, reason: "Transaction failed on-chain" };
       }
 
-      // Verify server-side
-      const res = await fetch("/api/verify-transaction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          walletAddress: address,
-          transactionHash: tx.hash,
-        }),
-      });
-      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
-      if (!res.ok || !json.ok) {
-        return { ok: false, reason: json.error || "Server could not verify transaction" };
+      // Best-effort server record (DB log of payment). Access is enforced on-chain.
+      try {
+        await fetch("/api/verify-transaction", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            walletAddress: address,
+            transactionHash: tx.hash,
+          }),
+        });
+      } catch (e) {
+        console.warn("[wallet] server-side payment record failed", e);
       }
+
       setPaid(true);
       await refreshBalance();
       return { ok: true };

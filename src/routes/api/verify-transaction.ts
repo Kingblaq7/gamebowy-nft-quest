@@ -1,13 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { JsonRpcProvider, formatEther, parseEther, getAddress } from "ethers";
+import { Contract, JsonRpcProvider, getAddress } from "ethers";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const ABEY_CHAIN_ID = 179;
 const ABEY_RPC = "https://rpc.abeychain.com";
-const TREASURY = "0x3A568b1a39365d8278428a1512DAB52b44C17735";
-const REQUIRED_WEI = parseEther("2");
+const CONTRACT_ADDRESS = "0xCBAD1110e02E80F6d752c5f85c2Ed2E83485D114";
 const MIN_CONFIRMATIONS = 1;
+
+const CONTRACT_ABI = [
+  "function canPlay(address user) view returns (bool)",
+];
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -42,9 +45,9 @@ export const Route = createFileRoute("/api/verify-transaction")({
 
         const wallet = parsed.walletAddress.toLowerCase();
         const txHash = parsed.transactionHash.toLowerCase();
-        const treasury = TREASURY.toLowerCase();
+        const contractAddr = CONTRACT_ADDRESS.toLowerCase();
 
-        // Replay protection: if this tx was already used, reject (unless same wallet already paid)
+        // Replay protection
         const { data: existingTx } = await supabaseAdmin
           .from("paid_wallets")
           .select("wallet_address, tx_hash")
@@ -58,17 +61,6 @@ export const Route = createFileRoute("/api/verify-transaction")({
           return json(409, { ok: false, error: "Transaction already used by another wallet" });
         }
 
-        // Wallet already paid with a different tx — accept silently
-        const { data: existingWallet } = await supabaseAdmin
-          .from("paid_wallets")
-          .select("wallet_address")
-          .eq("wallet_address", wallet)
-          .maybeSingle();
-        if (existingWallet) {
-          return json(200, { ok: true, alreadyPaid: true });
-        }
-
-        // Verify on-chain
         let provider: JsonRpcProvider;
         try {
           provider = new JsonRpcProvider(ABEY_RPC, ABEY_CHAIN_ID);
@@ -77,6 +69,7 @@ export const Route = createFileRoute("/api/verify-transaction")({
           return json(502, { ok: false, error: "Could not connect to Abey RPC" });
         }
 
+        // Fetch tx + receipt
         let tx: Awaited<ReturnType<JsonRpcProvider["getTransaction"]>> = null;
         let receipt: Awaited<ReturnType<JsonRpcProvider["getTransactionReceipt"]>> = null;
         try {
@@ -96,17 +89,16 @@ export const Route = createFileRoute("/api/verify-transaction")({
           return json(400, { ok: false, error: "Transaction failed on-chain" });
         }
 
-        // Confirmations
         try {
           const conf = await receipt.confirmations();
           if (conf < MIN_CONFIRMATIONS) {
             return json(400, { ok: false, error: "Not enough confirmations yet" });
           }
         } catch {
-          // older ethers fallback — skip if unavailable
+          // fallback — skip
         }
 
-        // Validate from / to / value
+        // Validate sender + recipient (must be the smart contract)
         let fromAddr = "";
         let toAddr = "";
         try {
@@ -119,33 +111,32 @@ export const Route = createFileRoute("/api/verify-transaction")({
         if (fromAddr !== wallet) {
           return json(400, { ok: false, error: "Transaction sender does not match wallet" });
         }
-        if (toAddr !== treasury) {
-          return json(400, { ok: false, error: "Transaction recipient is not the game treasury" });
-        }
-        if (tx.value < REQUIRED_WEI) {
-          return json(400, {
-            ok: false,
-            error: `Insufficient amount. Sent ${formatEther(tx.value)} ABEY, need 2 ABEY.`,
-          });
-        }
-        if (tx.chainId !== undefined && Number(tx.chainId) !== ABEY_CHAIN_ID) {
-          return json(400, { ok: false, error: "Transaction is not on Abey Mainnet" });
+        if (toAddr !== contractAddr) {
+          return json(400, { ok: false, error: "Transaction was not sent to the Gamebowy contract" });
         }
 
-        // Persist
+        // Authoritative on-chain access check
+        try {
+          const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+          const canPlay = (await contract.canPlay(wallet)) as boolean;
+          if (!canPlay) {
+            return json(400, { ok: false, error: "Contract does not yet recognize wallet as paid" });
+          }
+        } catch (e) {
+          console.error("canPlay() check failed", e);
+          return json(502, { ok: false, error: "Failed to verify access on-chain" });
+        }
+
+        // Persist payment record (idempotent)
         const { error: insertErr } = await supabaseAdmin.from("paid_wallets").insert({
           wallet_address: wallet,
           tx_hash: txHash,
           amount_wei: tx.value.toString(),
           chain_id: ABEY_CHAIN_ID,
         });
-        if (insertErr) {
-          // Unique violation — treat as already paid
-          if (insertErr.code === "23505") {
-            return json(200, { ok: true, alreadyPaid: true });
-          }
+        if (insertErr && insertErr.code !== "23505") {
           console.error("DB insert failed", insertErr);
-          return json(500, { ok: false, error: "Could not store payment record" });
+          // Non-fatal — access is enforced on-chain
         }
 
         return json(200, { ok: true });
