@@ -20,7 +20,7 @@ export const Route = createFileRoute("/api/award-game-tokens")({
             return Response.json({ error: "Invalid amount" }, { status: 400 });
           }
 
-          const supabase = createSupabaseServer();
+          const supabase = supabaseAdmin;
 
           const { data: existing } = await supabase
             .from("wallet_profiles")
