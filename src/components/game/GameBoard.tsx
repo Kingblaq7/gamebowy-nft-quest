@@ -250,6 +250,21 @@ export function GameBoard({ chapter, level }: Props) {
       setMaxCombo((m) => Math.max(m, chain + 1));
       if (n > 0) showPopup(Math.round(centerR / n), Math.round(centerC / n), `+${gained}`);
 
+      // COMBO BONUS: every auto-cascade match (chain >= 1) grants +combo_bonus moves.
+      // Moves NEVER decrement during a chain — the swap deduction happens in trySwap
+      // only after the chain fully resolves.
+      if (chain >= 1) {
+        const bonus = levelConfig.combo_bonus;
+        setMovesLeft((m) => m + bonus);
+        if (n > 0) {
+          showPopup(
+            Math.round(centerR / n),
+            Math.round(centerC / n),
+            `+${bonus} moves!`
+          );
+        }
+      }
+
       const marked = current.map((row, r) =>
         row.map((cell, c) => ({ ...cell, matched: matches.has(`${r}-${c}`) }))
       );
@@ -263,7 +278,7 @@ export function GameBoard({ chapter, level }: Props) {
       const next = await resolveMatches(collapsed, chain + 1);
       return { board: next.board, gained: gained + next.gained };
     },
-    [playMatch, playPowerup, level.tilePool, showPopup]
+    [playMatch, playPowerup, level.tilePool, showPopup, levelConfig.combo_bonus]
   );
 
   const trySwap = useCallback(
