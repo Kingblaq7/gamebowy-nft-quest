@@ -4,6 +4,8 @@ import { ArrowLeft, Pause, RotateCcw, Sparkles, Star, Trophy, X } from "lucide-r
 import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@/game/chapters";
 import { useAudio } from "@/components/audio/AudioProvider";
 import { usePlayer } from "@/game/usePlayer";
+import { useLevelConfig } from "@/game/useLevelConfig";
+import { useWallet } from "@/web3/WalletProvider";
 
 type Cell = { type: number; key: number; matched?: boolean };
 type Board = Cell[][];
