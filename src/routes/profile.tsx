@@ -358,3 +358,30 @@ function Stat({ label, value }: { label: string; value: string | number }) {
     </div>
   );
 }
+
+function SourceStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "aurora" | "stardust" | "accent";
+}) {
+  const dot =
+    tone === "aurora"
+      ? "bg-aurora"
+      : tone === "stardust"
+      ? "bg-stardust"
+      : "bg-accent";
+  return (
+    <div className="rounded-xl border border-border/30 bg-background/30 px-3 py-2">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground">
+        <span className={`h-1.5 w-1.5 rounded-full ${dot}`} /> {label}
+      </div>
+      <div className="mt-0.5 font-display text-sm font-bold tabular-nums">
+        {value} <span className="text-[9px] text-muted-foreground">GB</span>
+      </div>
+    </div>
+  );
+}
