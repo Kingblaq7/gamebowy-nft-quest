@@ -295,28 +295,48 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setPaying(true);
     try {
       const signer = await provider.getSigner();
-      const tx = await signer.sendTransaction({
-        to: GAME_TREASURY_ADDRESS,
-        value: parseEther(REQUIRED_PAYMENT_ABEY),
-      });
+      const contract = new Contract(GAMEBOWY_CONTRACT_ADDRESS, GAMEBOWY_ABI, signer);
+
+      // Sanity check: if the contract already says canPlay, skip the tx.
+      try {
+        const already = (await contract.canPlay(address)) as boolean;
+        if (already) {
+          setPaid(true);
+          return { ok: true };
+        }
+      } catch {
+        // non-fatal — continue to attempt payment
+      }
+
+      // Read on-chain fee (falls back to constant).
+      let value = parseEther(REQUIRED_PAYMENT_ABEY);
+      try {
+        const feeWei = (await contract.playFee()) as bigint;
+        if (typeof feeWei === "bigint" && feeWei > 0n) value = feeWei;
+      } catch {
+        // ignore — use default
+      }
+
+      const tx = await contract.payToPlay({ value });
       const receipt = await tx.wait();
       if (!receipt || receipt.status !== 1) {
         return { ok: false, reason: "Transaction failed on-chain" };
       }
 
-      // Verify server-side
-      const res = await fetch("/api/verify-transaction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          walletAddress: address,
-          transactionHash: tx.hash,
-        }),
-      });
-      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
-      if (!res.ok || !json.ok) {
-        return { ok: false, reason: json.error || "Server could not verify transaction" };
+      // Best-effort server record (DB log of payment). Access is enforced on-chain.
+      try {
+        await fetch("/api/verify-transaction", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            walletAddress: address,
+            transactionHash: tx.hash,
+          }),
+        });
+      } catch (e) {
+        console.warn("[wallet] server-side payment record failed", e);
       }
+
       setPaid(true);
       await refreshBalance();
       return { ok: true };
