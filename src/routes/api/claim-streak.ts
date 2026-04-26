@@ -83,6 +83,8 @@ export const Route = createFileRoute("/api/claim-streak")({
 
           const reward = Number((0.001 * newStreak).toFixed(6));
           const newBalance = Number(profile.gb_balance) + reward;
+          const newStreakTokens =
+            Number((profile as { streak_tokens?: number }).streak_tokens ?? 0) + reward;
 
           const { data: updated, error: updErr } = await supabaseAdmin
             .from("wallet_profiles")
@@ -90,6 +92,7 @@ export const Route = createFileRoute("/api/claim-streak")({
               streak: newStreak,
               last_claim_date: today,
               gb_balance: newBalance,
+              streak_tokens: newStreakTokens,
             })
             .eq("wallet_address", wallet)
             .select("*")

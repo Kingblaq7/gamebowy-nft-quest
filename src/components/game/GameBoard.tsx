@@ -4,6 +4,8 @@ import { ArrowLeft, Pause, RotateCcw, Sparkles, Star, Trophy, X } from "lucide-r
 import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@/game/chapters";
 import { useAudio } from "@/components/audio/AudioProvider";
 import { usePlayer } from "@/game/usePlayer";
+import { useLevelConfig } from "@/game/useLevelConfig";
+import { useWallet } from "@/web3/WalletProvider";
 
 type Cell = { type: number; key: number; matched?: boolean };
 type Board = Cell[][];
@@ -105,10 +107,20 @@ export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
   const { playMatch, playSwap, playPowerup } = useAudio();
   const { submitLevel, profile } = usePlayer();
+  const wallet = useWallet();
+
+  // Dynamic level config (moves, combo bonus) sourced from backend, with
+  // chapters.ts as a safe fallback so gameplay never blocks on the network.
+  const { config: levelConfig } = useLevelConfig(chapter.num, level.num, {
+    base_moves: level.moves,
+    combo_bonus: 2,
+    score_target:
+      level.objective.kind === "score" ? level.objective.target : level.starThresholds[0],
+  });
 
   const [board, setBoard] = useState<Board>(() => makeBoard(level.size, level.tilePool));
   const [score, setScore] = useState(0);
-  const [movesLeft, setMovesLeft] = useState(level.moves);
+  const [movesLeft, setMovesLeft] = useState(levelConfig.base_moves);
   const [busy, setBusy] = useState(false);
   const [maxCombo, setMaxCombo] = useState(0);
   const [collected, setCollected] = useState<Record<number, number>>({});
@@ -116,6 +128,14 @@ export function GameBoard({ chapter, level }: Props) {
   const [lastChain, setLastChain] = useState(0);
   const [paused, setPaused] = useState(false);
   const submittedRef = useRef(false);
+
+  // Re-sync starting moves when backend config arrives (only before first swap)
+  useEffect(() => {
+    if (!submittedRef.current && state === "playing" && score === 0) {
+      setMovesLeft(levelConfig.base_moves);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [levelConfig.base_moves]);
 
   // Floating score popups
   const [popups, setPopups] = useState<{ id: number; r: number; c: number; text: string }[]>([]);
@@ -156,8 +176,27 @@ export function GameBoard({ chapter, level }: Props) {
       const tokens = won ? level.reward.tokens : 0;
       setState(won ? "won" : "lost");
       await submitLevel(chapter.num, level.num, finalScore, stars, won, tokens);
+
+      // Credit the connected wallet's game-token balance (off-chain).
+      // Best-effort: gameplay continues even if this network call fails.
+      if (won && tokens > 0 && wallet.address) {
+        try {
+          await fetch("/api/award-game-tokens", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              walletAddress: wallet.address.toLowerCase(),
+              amount: tokens,
+              chapter: chapter.num,
+              level: level.num,
+            }),
+          });
+        } catch {
+          // ignore — local progress already saved via submitLevel
+        }
+      }
     },
-    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel]
+    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel, wallet.address]
   );
 
   // After moves run out, decide outcome
@@ -211,6 +250,21 @@ export function GameBoard({ chapter, level }: Props) {
       setMaxCombo((m) => Math.max(m, chain + 1));
       if (n > 0) showPopup(Math.round(centerR / n), Math.round(centerC / n), `+${gained}`);
 
+      // COMBO BONUS: every auto-cascade match (chain >= 1) grants +combo_bonus moves.
+      // Moves NEVER decrement during a chain — the swap deduction happens in trySwap
+      // only after the chain fully resolves.
+      if (chain >= 1) {
+        const bonus = levelConfig.combo_bonus;
+        setMovesLeft((m) => m + bonus);
+        if (n > 0) {
+          showPopup(
+            Math.round(centerR / n),
+            Math.round(centerC / n),
+            `+${bonus} moves!`
+          );
+        }
+      }
+
       const marked = current.map((row, r) =>
         row.map((cell, c) => ({ ...cell, matched: matches.has(`${r}-${c}`) }))
       );
@@ -224,7 +278,7 @@ export function GameBoard({ chapter, level }: Props) {
       const next = await resolveMatches(collapsed, chain + 1);
       return { board: next.board, gained: gained + next.gained };
     },
-    [playMatch, playPowerup, level.tilePool, showPopup]
+    [playMatch, playPowerup, level.tilePool, showPopup, levelConfig.combo_bonus]
   );
 
   const trySwap = useCallback(
@@ -313,7 +367,7 @@ export function GameBoard({ chapter, level }: Props) {
     submittedRef.current = false;
     setBoard(makeBoard(level.size, level.tilePool));
     setScore(0);
-    setMovesLeft(level.moves);
+    setMovesLeft(levelConfig.base_moves);
     setMaxCombo(0);
     setCollected({});
     setState("playing");

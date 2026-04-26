@@ -164,6 +164,25 @@ function ProfilePage() {
                 />
               </div>
 
+              {/* Token source breakdown */}
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                <SourceStat
+                  label="Game"
+                  value={(profile?.game_tokens ?? 0).toFixed(2)}
+                  tone="aurora"
+                />
+                <SourceStat
+                  label="Referral"
+                  value={(profile?.referral_tokens ?? 0).toFixed(2)}
+                  tone="stardust"
+                />
+                <SourceStat
+                  label="Streak"
+                  value={(profile?.streak_tokens ?? 0).toFixed(3)}
+                  tone="accent"
+                />
+              </div>
+
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => setGateOpen(true)}
@@ -335,6 +354,33 @@ function Stat({ label, value }: { label: string; value: string | number }) {
       </div>
       <div className="mt-0.5 font-display text-lg font-bold tabular-nums">
         {value}
+      </div>
+    </div>
+  );
+}
+
+function SourceStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "aurora" | "stardust" | "accent";
+}) {
+  const dot =
+    tone === "aurora"
+      ? "bg-aurora"
+      : tone === "stardust"
+      ? "bg-stardust"
+      : "bg-accent";
+  return (
+    <div className="rounded-xl border border-border/30 bg-background/30 px-3 py-2">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground">
+        <span className={`h-1.5 w-1.5 rounded-full ${dot}`} /> {label}
+      </div>
+      <div className="mt-0.5 font-display text-sm font-bold tabular-nums">
+        {value} <span className="text-[9px] text-muted-foreground">GB</span>
       </div>
     </div>
   );
