@@ -176,8 +176,27 @@ export function GameBoard({ chapter, level }: Props) {
       const tokens = won ? level.reward.tokens : 0;
       setState(won ? "won" : "lost");
       await submitLevel(chapter.num, level.num, finalScore, stars, won, tokens);
+
+      // Credit the connected wallet's game-token balance (off-chain).
+      // Best-effort: gameplay continues even if this network call fails.
+      if (won && tokens > 0 && wallet.address) {
+        try {
+          await fetch("/api/award-game-tokens", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              walletAddress: wallet.address.toLowerCase(),
+              amount: tokens,
+              chapter: chapter.num,
+              level: level.num,
+            }),
+          });
+        } catch {
+          // ignore — local progress already saved via submitLevel
+        }
+      }
     },
-    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel]
+    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel, wallet.address]
   );
 
   // After moves run out, decide outcome
