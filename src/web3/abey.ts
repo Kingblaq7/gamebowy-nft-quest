@@ -1,4 +1,4 @@
-// Abey Mainnet config + payment constants.
+// Abey Mainnet config + Gamebowy smart contract.
 // Treasury and chain are exposed publicly (anyone can verify on-chain).
 export const ABEY_CHAIN_ID_DEC = 179;
 export const ABEY_CHAIN_ID_HEX = "0xb3"; // 179
@@ -10,10 +10,61 @@ export const ABEY_CHAIN_PARAMS = {
   blockExplorerUrls: ["https://explorer.abeychain.com"],
 };
 
-// Treasury wallet that receives the 2 ABEY one-time access fee.
-export const GAME_TREASURY_ADDRESS =
-  (import.meta.env.VITE_GAME_TREASURY_ADDRESS as string | undefined) ||
-  "0x3A568b1a39365d8278428a1512DAB52b44C17735";
+// Deployed Gamebowy access contract on Abey Mainnet.
+// Source of truth for paid / admin status via canPlay(address).
+export const GAMEBOWY_CONTRACT_ADDRESS =
+  "0xCBAD1110e02E80F6d752c5f85c2Ed2E83485D114";
+
+// Kept for backward-compatible UI labels (treasury == contract that holds funds).
+export const GAME_TREASURY_ADDRESS = GAMEBOWY_CONTRACT_ADDRESS;
 
 // One-time fee required to unlock the game forever (per wallet).
 export const REQUIRED_PAYMENT_ABEY = "2";
+
+// Minimal ABI used by the dApp.
+export const GAMEBOWY_ABI = [
+  {
+    inputs: [{ internalType: "address", name: "user", type: "address" }],
+    name: "canPlay",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "hasPaid",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "isAdmin",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "playFee",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "payToPlay",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "player", type: "address" },
+      { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "PlayerPaid",
+    type: "event",
+  },
+] as const;
