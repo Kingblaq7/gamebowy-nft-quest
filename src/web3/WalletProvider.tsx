@@ -17,8 +17,19 @@ import {
   REQUIRED_PAYMENT_ABEY,
 } from "./abey";
 
-// Read-only provider for canPlay() checks even before wallet connect.
-const READ_PROVIDER = new JsonRpcProvider(ABEY_CHAIN_PARAMS.rpcUrls[0], ABEY_CHAIN_ID_DEC);
+// Read-only provider for canPlay() checks. Lazy-init so a bad RPC at startup
+// can never blank-screen the app (SSR or client).
+let _readProvider: JsonRpcProvider | null = null;
+function getReadProvider(): JsonRpcProvider | null {
+  if (_readProvider) return _readProvider;
+  try {
+    _readProvider = new JsonRpcProvider(ABEY_CHAIN_PARAMS.rpcUrls[0], ABEY_CHAIN_ID_DEC);
+    return _readProvider;
+  } catch (e) {
+    console.warn("[wallet] failed to init read provider", e);
+    return null;
+  }
+}
 
 type Eip1193Provider = {
   request: (args: { method: string; params?: unknown[] | object }) => Promise<unknown>;
@@ -137,13 +148,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const a = (addr ?? address)?.toLowerCase();
     if (!a) return false;
     try {
+      const provider = getReadProvider();
+      if (!provider) return false;
       // canPlay() returns true for paid wallets AND admins set on the contract.
-      const contract = new Contract(GAMEBOWY_CONTRACT_ADDRESS, GAMEBOWY_ABI, READ_PROVIDER);
+      const contract = new Contract(GAMEBOWY_CONTRACT_ADDRESS, GAMEBOWY_ABI, provider);
       const canPlay = (await contract.canPlay(a)) as boolean;
       setPaid(canPlay);
       return canPlay;
     } catch (e) {
-      console.warn("[wallet] canPlay() check failed", e);
+      console.warn("[wallet] canPlay() check failed (RPC unavailable)", e);
       return false;
     }
   }, [address]);
