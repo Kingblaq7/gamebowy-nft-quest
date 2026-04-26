@@ -7,15 +7,18 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { BrowserProvider, formatEther, parseEther } from "ethers";
-import { supabase } from "@/integrations/supabase/client";
+import { BrowserProvider, Contract, JsonRpcProvider, formatEther, parseEther } from "ethers";
 import {
   ABEY_CHAIN_ID_DEC,
   ABEY_CHAIN_ID_HEX,
   ABEY_CHAIN_PARAMS,
-  GAME_TREASURY_ADDRESS,
+  GAMEBOWY_ABI,
+  GAMEBOWY_CONTRACT_ADDRESS,
   REQUIRED_PAYMENT_ABEY,
 } from "./abey";
+
+// Read-only provider for canPlay() checks even before wallet connect.
+const READ_PROVIDER = new JsonRpcProvider(ABEY_CHAIN_PARAMS.rpcUrls[0], ABEY_CHAIN_ID_DEC);
 
 type Eip1193Provider = {
   request: (args: { method: string; params?: unknown[] | object }) => Promise<unknown>;
