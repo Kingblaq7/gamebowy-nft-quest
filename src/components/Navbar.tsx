@@ -48,6 +48,21 @@ export function Navbar() {
               {shortAddr(w.address)}
             </Link>
           )}
+          <Link
+            to="/profile"
+            aria-label="Profile"
+            title="Profile"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-card/50 backdrop-blur transition-colors hover:bg-card/70"
+          >
+            <User className="h-4 w-4" />
+            {w.address && (
+              <span
+                className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background ${
+                  w.isAdmin ? "bg-stardust" : w.paid ? "bg-aurora" : "bg-muted-foreground"
+                }`}
+              />
+            )}
+          </Link>
           <PlayButton
             to="/play"
             className="rounded-full bg-gradient-aurora px-5 py-2 text-sm font-semibold text-background transition-transform hover:scale-105"
