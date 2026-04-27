@@ -111,6 +111,7 @@ export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
   const { playMatch, playSwap, playPowerup } = useAudio();
   const { submitLevel, profile } = usePlayer();
+  const wallet = useWallet();
 
   const [board, setBoard] = useState<Board>(() => makeBoard(level.size, level.tilePool));
   const [score, setScore] = useState(0);
@@ -121,6 +122,9 @@ export function GameBoard({ chapter, level }: Props) {
   const [state, setState] = useState<GameState>("playing");
   const [lastChain, setLastChain] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [comboFlash, setComboFlash] = useState<string | null>(null);
+  const [buying, setBuying] = useState(false);
+  const [buyError, setBuyError] = useState<string | null>(null);
   const submittedRef = useRef(false);
 
   // Floating score popups
