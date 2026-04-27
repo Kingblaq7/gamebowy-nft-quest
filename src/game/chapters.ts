@@ -78,10 +78,10 @@ export const CHAPTERS: ChapterDef[] = [
     bgGradient: "linear-gradient(135deg, oklch(0.32 0.2 340), oklch(0.18 0.14 320))",
     rareReward: { tokens: 400, nft: "Bloomstar" },
     levels: [
-      { num: 1, name: "Petal Fall", moves: 32, size: 6, objective: { kind: "collect", tileId: tile(2), count: 20 }, starThresholds: [3000, 4500, 6500], reward: { tokens: 45, nft: "Stellar Petal" } },
-      { num: 2, name: "Star Cluster", moves: 30, size: 6, objective: { kind: "score", target: 4500 }, starThresholds: [4500, 6500, 9000], reward: { tokens: 55, nft: "Cluster Bead" } },
-      { num: 3, name: "Nova Spin", moves: 28, size: 6, objective: { kind: "combo", count: 7 }, starThresholds: [4000, 6000, 9000], reward: { tokens: 65, nft: "Nova Spark" } },
-      { num: 4, name: "Bloom Crown", moves: 32, size: 7, objective: { kind: "score", target: 7000 }, starThresholds: [7000, 9500, 13000], reward: { tokens: 75, nft: "Crown Shard" } },
+      { num: 1, name: "Petal Fall", moves: 12, size: 6, objective: { kind: "collect", tileId: tile(2), count: 20 }, starThresholds: [3000, 4500, 6500], reward: { tokens: 45, nft: "Stellar Petal" } },
+      { num: 2, name: "Star Cluster", moves: 10, size: 6, objective: { kind: "score", target: 4500 }, starThresholds: [4500, 6500, 9000], reward: { tokens: 55, nft: "Cluster Bead" } },
+      { num: 3, name: "Nova Spin", moves: 10, size: 6, objective: { kind: "combo", count: 7 }, starThresholds: [4000, 6000, 9000], reward: { tokens: 65, nft: "Nova Spark" } },
+      { num: 4, name: "Bloom Crown", moves: 12, size: 7, objective: { kind: "score", target: 7000 }, starThresholds: [7000, 9500, 13000], reward: { tokens: 75, nft: "Crown Shard" } },
     ],
   },
   {
