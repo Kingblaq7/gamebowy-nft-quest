@@ -122,10 +122,10 @@ export const CHAPTERS: ChapterDef[] = [
     bgGradient: "linear-gradient(135deg, oklch(0.32 0.18 30), oklch(0.18 0.12 15))",
     rareReward: { tokens: 800, nft: "Ember Heart" },
     levels: [
-      { num: 1, name: "Spark Drift", moves: 32, size: 7, objective: { kind: "score", target: 6000 }, starThresholds: [6000, 8500, 12000], reward: { tokens: 85, nft: "Spark Ember" } },
-      { num: 2, name: "Cinder Hunt", moves: 30, size: 7, objective: { kind: "collect", tileId: tile(2), count: 28 }, starThresholds: [5500, 8000, 11500], reward: { tokens: 95, nft: "Cinder Petal" } },
-      { num: 3, name: "Pyre Cascade", moves: 28, size: 7, objective: { kind: "combo", count: 11 }, starThresholds: [7500, 10500, 15000], reward: { tokens: 105, nft: "Pyre Mark" } },
-      { num: 4, name: "Phoenix Wake", moves: 30, size: 7, objective: { kind: "score", target: 11500 }, starThresholds: [11500, 16000, 22000], reward: { tokens: 120, nft: "Phoenix Crown" } },
+      { num: 1, name: "Spark Drift", moves: 12, size: 7, objective: { kind: "score", target: 6000 }, starThresholds: [6000, 8500, 12000], reward: { tokens: 85, nft: "Spark Ember" } },
+      { num: 2, name: "Cinder Hunt", moves: 10, size: 7, objective: { kind: "collect", tileId: tile(2), count: 28 }, starThresholds: [5500, 8000, 11500], reward: { tokens: 95, nft: "Cinder Petal" } },
+      { num: 3, name: "Pyre Cascade", moves: 10, size: 7, objective: { kind: "combo", count: 11 }, starThresholds: [7500, 10500, 15000], reward: { tokens: 105, nft: "Pyre Mark" } },
+      { num: 4, name: "Phoenix Wake", moves: 10, size: 7, objective: { kind: "score", target: 11500 }, starThresholds: [11500, 16000, 22000], reward: { tokens: 120, nft: "Phoenix Crown" } },
     ],
   },
   {
