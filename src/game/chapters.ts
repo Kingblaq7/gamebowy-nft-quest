@@ -89,10 +89,10 @@ export const CHAPTERS: ChapterDef[] = [
     bgGradient: "linear-gradient(135deg, oklch(0.32 0.16 80), oklch(0.18 0.1 60))",
     rareReward: { tokens: 500, nft: "Forge Sigil" },
     levels: [
-      { num: 1, name: "Smelt", moves: 32, size: 6, objective: { kind: "collect", tileId: tile(3), count: 24 }, starThresholds: [3500, 5000, 7000], reward: { tokens: 55, nft: "Molten Coin" } },
-      { num: 2, name: "Ingot Run", moves: 30, size: 6, objective: { kind: "score", target: 5500 }, starThresholds: [5500, 7500, 10500], reward: { tokens: 65, nft: "Ingot Disc" } },
-      { num: 3, name: "Anvil Strike", moves: 28, size: 6, objective: { kind: "combo", count: 8 }, starThresholds: [5000, 7000, 10000], reward: { tokens: 75, nft: "Anvil Mark" } },
-      { num: 4, name: "Mint Master", moves: 32, size: 7, objective: { kind: "score", target: 8000 }, starThresholds: [8000, 11000, 15000], reward: { tokens: 90, nft: "Master Coin" } },
+      { num: 1, name: "Smelt", moves: 12, size: 6, objective: { kind: "collect", tileId: tile(3), count: 24 }, starThresholds: [3500, 5000, 7000], reward: { tokens: 55, nft: "Molten Coin" } },
+      { num: 2, name: "Ingot Run", moves: 10, size: 6, objective: { kind: "score", target: 5500 }, starThresholds: [5500, 7500, 10500], reward: { tokens: 65, nft: "Ingot Disc" } },
+      { num: 3, name: "Anvil Strike", moves: 10, size: 6, objective: { kind: "combo", count: 8 }, starThresholds: [5000, 7000, 10000], reward: { tokens: 75, nft: "Anvil Mark" } },
+      { num: 4, name: "Mint Master", moves: 12, size: 7, objective: { kind: "score", target: 8000 }, starThresholds: [8000, 11000, 15000], reward: { tokens: 90, nft: "Master Coin" } },
     ],
   },
   {
