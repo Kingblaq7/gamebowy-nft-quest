@@ -111,10 +111,10 @@ export const CHAPTERS: ChapterDef[] = [
     bgGradient: "linear-gradient(135deg, oklch(0.3 0.1 300), oklch(0.16 0.08 280))",
     rareReward: { tokens: 700, nft: "Lunar Sigil" },
     levels: [
-      { num: 1, name: "Crescent", moves: 32, size: 7, objective: { kind: "collect", tileId: tile(5), count: 26 }, starThresholds: [4500, 6500, 9000], reward: { tokens: 75, nft: "Crescent Shard" } },
-      { num: 2, name: "Moonglide", moves: 30, size: 7, objective: { kind: "score", target: 7500 }, starThresholds: [7500, 10500, 14500], reward: { tokens: 85, nft: "Glide Moon" } },
-      { num: 3, name: "Eclipse", moves: 28, size: 7, objective: { kind: "combo", count: 10 }, starThresholds: [7000, 10000, 14000], reward: { tokens: 95, nft: "Eclipse Disc" } },
-      { num: 4, name: "Silver Tide", moves: 32, size: 7, objective: { kind: "score", target: 10000 }, starThresholds: [10000, 14000, 19000], reward: { tokens: 110, nft: "Silver Crown" } },
+      { num: 1, name: "Crescent", moves: 12, size: 7, objective: { kind: "collect", tileId: tile(5), count: 26 }, starThresholds: [4500, 6500, 9000], reward: { tokens: 75, nft: "Crescent Shard" } },
+      { num: 2, name: "Moonglide", moves: 10, size: 7, objective: { kind: "score", target: 7500 }, starThresholds: [7500, 10500, 14500], reward: { tokens: 85, nft: "Glide Moon" } },
+      { num: 3, name: "Eclipse", moves: 10, size: 7, objective: { kind: "combo", count: 10 }, starThresholds: [7000, 10000, 14000], reward: { tokens: 95, nft: "Eclipse Disc" } },
+      { num: 4, name: "Silver Tide", moves: 12, size: 7, objective: { kind: "score", target: 10000 }, starThresholds: [10000, 14000, 19000], reward: { tokens: 110, nft: "Silver Crown" } },
     ],
   },
   {
