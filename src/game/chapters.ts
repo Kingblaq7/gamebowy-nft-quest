@@ -67,10 +67,10 @@ export const CHAPTERS: ChapterDef[] = [
     bgGradient: "linear-gradient(135deg, oklch(0.3 0.18 265), oklch(0.15 0.12 250))",
     rareReward: { tokens: 320, nft: "Tidal Orb" },
     levels: [
-      { num: 1, name: "Ripple", moves: 32, size: 6, objective: { kind: "score", target: 3000 }, starThresholds: [3000, 4500, 6500], reward: { tokens: 35, nft: "Ripple Drop" } },
-      { num: 2, name: "Orb Cascade", moves: 30, size: 6, objective: { kind: "collect", tileId: tile(1), count: 22 }, starThresholds: [2500, 4000, 6000], reward: { tokens: 45, nft: "Cascade Orb" } },
-      { num: 3, name: "Twin Currents", moves: 32, size: 6, objective: { kind: "combo", count: 6 }, starThresholds: [3500, 5500, 8000], reward: { tokens: 55, nft: "Current Pearl" } },
-      { num: 4, name: "Tidal Bloom", moves: 30, size: 6, objective: { kind: "score", target: 5000 }, starThresholds: [5000, 7000, 10000], reward: { tokens: 65, nft: "Bloom Sphere" } },
+      { num: 1, name: "Ripple", moves: 12, size: 6, objective: { kind: "score", target: 3000 }, starThresholds: [3000, 4500, 6500], reward: { tokens: 35, nft: "Ripple Drop" } },
+      { num: 2, name: "Orb Cascade", moves: 10, size: 6, objective: { kind: "collect", tileId: tile(1), count: 22 }, starThresholds: [2500, 4000, 6000], reward: { tokens: 45, nft: "Cascade Orb" } },
+      { num: 3, name: "Twin Currents", moves: 12, size: 6, objective: { kind: "combo", count: 6 }, starThresholds: [3500, 5500, 8000], reward: { tokens: 55, nft: "Current Pearl" } },
+      { num: 4, name: "Tidal Bloom", moves: 10, size: 6, objective: { kind: "score", target: 5000 }, starThresholds: [5000, 7000, 10000], reward: { tokens: 65, nft: "Bloom Sphere" } },
     ],
   },
   {
