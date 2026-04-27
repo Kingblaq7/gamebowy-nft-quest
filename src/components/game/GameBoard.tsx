@@ -263,7 +263,7 @@ export function GameBoard({ chapter, level }: Props) {
       }
 
       setLastChain(0);
-      const { board: settled } = await resolveMatches(next, 0);
+      const { board: settled, gained } = await resolveMatches(next, 0);
 
       // Ensure board has moves
       if (!hasAnyValidMove(settled)) {
@@ -271,7 +271,14 @@ export function GameBoard({ chapter, level }: Props) {
         const reshuffled = makeBoard(size, level.tilePool);
         setBoard(reshuffled);
       }
-      setMovesLeft((m) => m - 1);
+
+      // Combo bonus: if a single move earned more than threshold, refund extra moves
+      const isCombo = gained > COMBO_THRESHOLD;
+      setMovesLeft((m) => m - 1 + (isCombo ? COMBO_BONUS_MOVES : 0));
+      if (isCombo) {
+        setComboFlash(`🔥 COMBO! +${COMBO_BONUS_MOVES} Moves`);
+        window.setTimeout(() => setComboFlash(null), 1200);
+      }
       setBusy(false);
     },
     [board, busy, state, paused, resolveMatches, playSwap, level.tilePool]
