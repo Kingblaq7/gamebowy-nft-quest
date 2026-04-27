@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Pause, RotateCcw, Sparkles, Star, Trophy, X } from "lucide-react";
+import { ArrowLeft, Coins, Pause, RotateCcw, Sparkles, Star, Trophy, X, Zap } from "lucide-react";
 import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@/game/chapters";
 import { useAudio } from "@/components/audio/AudioProvider";
 import { usePlayer } from "@/game/usePlayer";
+import { useWallet } from "@/web3/WalletProvider";
+
+const COMBO_THRESHOLD = 30; // points in single move > this = combo
+const COMBO_BONUS_MOVES = 2;
+const BUY_COST_GB = 10;
+const BUY_MOVES_AMOUNT = 30;
 
 type Cell = { type: number; key: number; matched?: boolean };
 type Board = Cell[][];
@@ -99,12 +105,13 @@ interface Props {
   level: LevelDef;
 }
 
-type GameState = "playing" | "won" | "lost";
+type GameState = "playing" | "won" | "lost" | "outOfMoves";
 
 export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
   const { playMatch, playSwap, playPowerup } = useAudio();
   const { submitLevel, profile } = usePlayer();
+  const wallet = useWallet();
 
   const [board, setBoard] = useState<Board>(() => makeBoard(level.size, level.tilePool));
   const [score, setScore] = useState(0);
@@ -115,6 +122,9 @@ export function GameBoard({ chapter, level }: Props) {
   const [state, setState] = useState<GameState>("playing");
   const [lastChain, setLastChain] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [comboFlash, setComboFlash] = useState<string | null>(null);
+  const [buying, setBuying] = useState(false);
+  const [buyError, setBuyError] = useState<string | null>(null);
   const submittedRef = useRef(false);
 
   // Floating score popups
@@ -167,7 +177,8 @@ export function GameBoard({ chapter, level }: Props) {
     if (objectiveMet) {
       void finishLevel(true, score);
     } else if (movesLeft <= 0) {
-      void finishLevel(false, score);
+      // Give the player a chance to buy more moves before finalizing.
+      setState("outOfMoves");
     }
   }, [movesLeft, busy, objectiveMet, score, state, finishLevel]);
 
@@ -253,7 +264,7 @@ export function GameBoard({ chapter, level }: Props) {
       }
 
       setLastChain(0);
-      const { board: settled } = await resolveMatches(next, 0);
+      const { board: settled, gained } = await resolveMatches(next, 0);
 
       // Ensure board has moves
       if (!hasAnyValidMove(settled)) {
@@ -261,7 +272,14 @@ export function GameBoard({ chapter, level }: Props) {
         const reshuffled = makeBoard(size, level.tilePool);
         setBoard(reshuffled);
       }
-      setMovesLeft((m) => m - 1);
+
+      // Combo bonus: if a single move earned more than threshold, refund extra moves
+      const isCombo = gained > COMBO_THRESHOLD;
+      setMovesLeft((m) => m - 1 + (isCombo ? COMBO_BONUS_MOVES : 0));
+      if (isCombo) {
+        setComboFlash(`🔥 COMBO! +${COMBO_BONUS_MOVES} Moves`);
+        window.setTimeout(() => setComboFlash(null), 1200);
+      }
       setBusy(false);
     },
     [board, busy, state, paused, resolveMatches, playSwap, level.tilePool]
@@ -320,7 +338,46 @@ export function GameBoard({ chapter, level }: Props) {
     setLastChain(0);
     setPaused(false);
     setSelected(null);
+    setBuyError(null);
   };
+
+  const giveUp = useCallback(() => {
+    void finishLevel(false, score);
+  }, [finishLevel, score]);
+
+  const buyMoves = useCallback(async () => {
+    setBuyError(null);
+    if (!wallet.address) {
+      setBuyError("Connect your wallet first");
+      return;
+    }
+    setBuying(true);
+    try {
+      const res = await fetch("/api/buy-moves", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: wallet.address.toLowerCase() }),
+      });
+      const json = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        movesGranted?: number;
+        error?: string;
+      };
+      if (!res.ok || !json.ok) {
+        setBuyError(json.error ?? "Purchase failed");
+        return;
+      }
+      const granted = json.movesGranted ?? BUY_MOVES_AMOUNT;
+      setMovesLeft((m) => m + granted);
+      setState("playing");
+      setComboFlash(`+${granted} Moves!`);
+      window.setTimeout(() => setComboFlash(null), 1400);
+    } catch (e) {
+      setBuyError((e as Error).message ?? "Network error");
+    } finally {
+      setBuying(false);
+    }
+  }, [wallet.address]);
 
   const stars = computeStars(score);
 
@@ -445,6 +502,55 @@ export function GameBoard({ chapter, level }: Props) {
           </p>
         </div>
       </div>
+
+      {/* Combo flash banner */}
+      {comboFlash && (
+        <div
+          className="pointer-events-none absolute left-1/2 top-24 z-40 -translate-x-1/2 rounded-full bg-gradient-aurora px-5 py-2 font-display text-sm font-black text-background shadow-lg"
+          style={{ animation: "fade-in 0.2s ease-out" }}
+        >
+          {comboFlash}
+        </div>
+      )}
+
+      {/* Out of moves overlay (offer to buy) */}
+      {state === "outOfMoves" && (
+        <Overlay>
+          <Zap className="h-10 w-10 text-stardust" style={{ filter: "drop-shadow(0 0 16px currentColor)" }} />
+          <h2 className="font-display text-3xl font-black">Out of Moves</h2>
+          <p className="text-center text-sm text-muted-foreground">
+            Score: {score.toLocaleString()} · Keep going by buying more moves with GB tokens.
+          </p>
+          <button
+            type="button"
+            onClick={() => void buyMoves()}
+            disabled={buying}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-aurora px-5 py-3 font-bold text-background disabled:opacity-60"
+          >
+            <Coins className="h-4 w-4" />
+            {buying ? "Processing…" : `Buy ${BUY_MOVES_AMOUNT} Moves (${BUY_COST_GB} GB)`}
+          </button>
+          {buyError && (
+            <p className="text-center text-xs text-destructive">{buyError}</p>
+          )}
+          <div className="flex w-full gap-2">
+            <button
+              type="button"
+              onClick={giveUp}
+              className="flex-1 rounded-full border border-border/50 bg-card/40 px-4 py-3 text-sm font-semibold backdrop-blur"
+            >
+              End Run
+            </button>
+            <button
+              type="button"
+              onClick={restart}
+              className="flex-1 rounded-full border border-border/50 bg-card/40 px-4 py-3 text-sm font-semibold backdrop-blur"
+            >
+              Restart
+            </button>
+          </div>
+        </Overlay>
+      )}
 
       {/* Pause overlay */}
       {paused && state === "playing" && (
