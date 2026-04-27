@@ -144,10 +144,10 @@ export const CHAPTERS: ChapterDef[] = [
     bgGradient: "linear-gradient(135deg, oklch(0.3 0.18 180), oklch(0.16 0.12 200))",
     rareReward: { tokens: 1100, nft: "Quantum Seed" },
     levels: [
-      { num: 1, name: "Wave Function", moves: 32, size: 7, objective: { kind: "score", target: 8000 }, starThresholds: [8000, 11500, 16000], reward: { tokens: 110, nft: "Wave Bead" } },
-      { num: 2, name: "Entangle", moves: 30, size: 7, objective: { kind: "combo", count: 13 }, starThresholds: [10000, 14000, 19500], reward: { tokens: 120, nft: "Entangle Ring" } },
-      { num: 3, name: "Probability Bloom", moves: 30, size: 7, objective: { kind: "collect", tileId: tile(4), count: 32 }, starThresholds: [9000, 13000, 18000], reward: { tokens: 135, nft: "Bloom Quanta" } },
-      { num: 4, name: "Schrödinger's Cascade", moves: 32, size: 8, objective: { kind: "score", target: 15000 }, starThresholds: [15000, 21000, 28000], reward: { tokens: 155, nft: "Cascade Knot" } },
+      { num: 1, name: "Wave Function", moves: 12, size: 7, objective: { kind: "score", target: 8000 }, starThresholds: [8000, 11500, 16000], reward: { tokens: 110, nft: "Wave Bead" } },
+      { num: 2, name: "Entangle", moves: 10, size: 7, objective: { kind: "combo", count: 13 }, starThresholds: [10000, 14000, 19500], reward: { tokens: 120, nft: "Entangle Ring" } },
+      { num: 3, name: "Probability Bloom", moves: 10, size: 7, objective: { kind: "collect", tileId: tile(4), count: 32 }, starThresholds: [9000, 13000, 18000], reward: { tokens: 135, nft: "Bloom Quanta" } },
+      { num: 4, name: "Schrödinger's Cascade", moves: 12, size: 8, objective: { kind: "score", target: 15000 }, starThresholds: [15000, 21000, 28000], reward: { tokens: 155, nft: "Cascade Knot" } },
     ],
   },
   {
