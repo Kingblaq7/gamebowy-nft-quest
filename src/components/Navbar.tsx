@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import { SoundControl } from "./audio/SoundControl";
 import { PlayButton } from "@/web3/PlayButton";
 import { useWallet, shortAddr } from "@/web3/WalletProvider";
