@@ -57,9 +57,9 @@ export const CHAPTERS: ChapterDef[] = [
     rareReward: { tokens: 250, nft: "Genesis Crystal" },
     levels: [
       { num: 1, name: "First Light", moves: 32, size: 6, objective: { kind: "score", target: 1500 }, starThresholds: [1500, 2500, 4000], reward: { tokens: 25, nft: "Spark Tile" } },
-      { num: 2, name: "Pulse Wave", moves: 30, size: 6, objective: { kind: "score", target: 2500 }, starThresholds: [2500, 4000, 6000], reward: { tokens: 30, nft: "Pulse Shard" } },
-      { num: 3, name: "Crystal Hunt", moves: 34, size: 6, objective: { kind: "collect", tileId: tile(0), count: 18 }, starThresholds: [2000, 3500, 5000], reward: { tokens: 40, nft: "Hunter Crystal" } },
-      { num: 4, name: "Genesis Burst", moves: 28, size: 6, objective: { kind: "combo", count: 5 }, starThresholds: [3000, 5000, 7500], reward: { tokens: 50, nft: "Burst Core" } },
+      { num: 2, name: "Pulse Wave", moves: 40, size: 6, objective: { kind: "score", target: 2500 }, starThresholds: [2500, 4000, 6000], reward: { tokens: 30, nft: "Pulse Shard" } },
+      { num: 3, name: "Crystal Hunt", moves: 42, size: 6, objective: { kind: "collect", tileId: tile(0), count: 18 }, starThresholds: [2000, 3500, 5000], reward: { tokens: 40, nft: "Hunter Crystal" } },
+      { num: 4, name: "Genesis Burst", moves: 45, size: 6, objective: { kind: "combo", count: 5 }, starThresholds: [3000, 5000, 7500], reward: { tokens: 50, nft: "Burst Core" } },
     ],
   },
   {
