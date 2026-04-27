@@ -100,10 +100,10 @@ export const CHAPTERS: ChapterDef[] = [
     bgGradient: "linear-gradient(135deg, oklch(0.3 0.16 150), oklch(0.16 0.1 170))",
     rareReward: { tokens: 600, nft: "Verdant Heart" },
     levels: [
-      { num: 1, name: "Mossfall", moves: 32, size: 6, objective: { kind: "collect", tileId: tile(4), count: 26 }, starThresholds: [4000, 6000, 8500], reward: { tokens: 65, nft: "Moss Gem" } },
-      { num: 2, name: "Vine Spiral", moves: 30, size: 7, objective: { kind: "score", target: 6500 }, starThresholds: [6500, 9000, 12500], reward: { tokens: 75, nft: "Vine Bead" } },
-      { num: 3, name: "Bloom Storm", moves: 30, size: 7, objective: { kind: "combo", count: 9 }, starThresholds: [6000, 8500, 12000], reward: { tokens: 85, nft: "Storm Petal" } },
-      { num: 4, name: "Verdant Pulse", moves: 32, size: 7, objective: { kind: "score", target: 9000 }, starThresholds: [9000, 12500, 17000], reward: { tokens: 100, nft: "Pulse Heart" } },
+      { num: 1, name: "Mossfall", moves: 12, size: 6, objective: { kind: "collect", tileId: tile(4), count: 26 }, starThresholds: [4000, 6000, 8500], reward: { tokens: 65, nft: "Moss Gem" } },
+      { num: 2, name: "Vine Spiral", moves: 10, size: 7, objective: { kind: "score", target: 6500 }, starThresholds: [6500, 9000, 12500], reward: { tokens: 75, nft: "Vine Bead" } },
+      { num: 3, name: "Bloom Storm", moves: 10, size: 7, objective: { kind: "combo", count: 9 }, starThresholds: [6000, 8500, 12000], reward: { tokens: 85, nft: "Storm Petal" } },
+      { num: 4, name: "Verdant Pulse", moves: 12, size: 7, objective: { kind: "score", target: 9000 }, starThresholds: [9000, 12500, 17000], reward: { tokens: 100, nft: "Pulse Heart" } },
     ],
   },
   {
