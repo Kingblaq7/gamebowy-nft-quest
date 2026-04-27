@@ -133,10 +133,10 @@ export const CHAPTERS: ChapterDef[] = [
     bgGradient: "linear-gradient(135deg, oklch(0.3 0.14 200), oklch(0.18 0.1 220))",
     rareReward: { tokens: 900, nft: "Halo Prism" },
     levels: [
-      { num: 1, name: "Frost Whisper", moves: 32, size: 7, objective: { kind: "collect", tileId: tile(1), count: 30 }, starThresholds: [6500, 9000, 13000], reward: { tokens: 95, nft: "Whisper Shard" } },
-      { num: 2, name: "Ice Aria", moves: 30, size: 7, objective: { kind: "score", target: 9000 }, starThresholds: [9000, 12500, 17000], reward: { tokens: 105, nft: "Aria Crystal" } },
-      { num: 3, name: "Glacier Spin", moves: 28, size: 7, objective: { kind: "combo", count: 12 }, starThresholds: [8500, 12000, 17000], reward: { tokens: 115, nft: "Glacier Mark" } },
-      { num: 4, name: "Halo Bloom", moves: 32, size: 8, objective: { kind: "score", target: 13000 }, starThresholds: [13000, 18000, 25000], reward: { tokens: 135, nft: "Halo Crown" } },
+      { num: 1, name: "Frost Whisper", moves: 12, size: 7, objective: { kind: "collect", tileId: tile(1), count: 30 }, starThresholds: [6500, 9000, 13000], reward: { tokens: 95, nft: "Whisper Shard" } },
+      { num: 2, name: "Ice Aria", moves: 10, size: 7, objective: { kind: "score", target: 9000 }, starThresholds: [9000, 12500, 17000], reward: { tokens: 105, nft: "Aria Crystal" } },
+      { num: 3, name: "Glacier Spin", moves: 10, size: 7, objective: { kind: "combo", count: 12 }, starThresholds: [8500, 12000, 17000], reward: { tokens: 115, nft: "Glacier Mark" } },
+      { num: 4, name: "Halo Bloom", moves: 12, size: 8, objective: { kind: "score", target: 13000 }, starThresholds: [13000, 18000, 25000], reward: { tokens: 135, nft: "Halo Crown" } },
     ],
   },
   {
