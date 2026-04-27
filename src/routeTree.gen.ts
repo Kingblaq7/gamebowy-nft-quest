@@ -17,6 +17,7 @@ import { Route as ApiReferralsRouteImport } from './routes/api/referrals'
 import { Route as ApiProfileRouteImport } from './routes/api/profile'
 import { Route as ApiClaimStreakRouteImport } from './routes/api/claim-streak'
 import { Route as ApiCheckAccessRouteImport } from './routes/api/check-access'
+import { Route as ApiBuyMovesRouteImport } from './routes/api/buy-moves'
 import { Route as ApiAwardGameTokensRouteImport } from './routes/api/award-game-tokens'
 import { Route as PlayChapterLevelRouteImport } from './routes/play.$chapter.$level'
 
@@ -60,6 +61,11 @@ const ApiCheckAccessRoute = ApiCheckAccessRouteImport.update({
   path: '/api/check-access',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBuyMovesRoute = ApiBuyMovesRouteImport.update({
+  id: '/api/buy-moves',
+  path: '/api/buy-moves',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAwardGameTokensRoute = ApiAwardGameTokensRouteImport.update({
   id: '/api/award-game-tokens',
   path: '/api/award-game-tokens',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/api/award-game-tokens': typeof ApiAwardGameTokensRoute
+  '/api/buy-moves': typeof ApiBuyMovesRoute
   '/api/check-access': typeof ApiCheckAccessRoute
   '/api/claim-streak': typeof ApiClaimStreakRoute
   '/api/profile': typeof ApiProfileRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/api/award-game-tokens': typeof ApiAwardGameTokensRoute
+  '/api/buy-moves': typeof ApiBuyMovesRoute
   '/api/check-access': typeof ApiCheckAccessRoute
   '/api/claim-streak': typeof ApiClaimStreakRoute
   '/api/profile': typeof ApiProfileRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/profile': typeof ProfileRoute
   '/api/award-game-tokens': typeof ApiAwardGameTokensRoute
+  '/api/buy-moves': typeof ApiBuyMovesRoute
   '/api/check-access': typeof ApiCheckAccessRoute
   '/api/claim-streak': typeof ApiClaimStreakRoute
   '/api/profile': typeof ApiProfileRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/api/award-game-tokens'
+    | '/api/buy-moves'
     | '/api/check-access'
     | '/api/claim-streak'
     | '/api/profile'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/api/award-game-tokens'
+    | '/api/buy-moves'
     | '/api/check-access'
     | '/api/claim-streak'
     | '/api/profile'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/profile'
     | '/api/award-game-tokens'
+    | '/api/buy-moves'
     | '/api/check-access'
     | '/api/claim-streak'
     | '/api/profile'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProfileRoute: typeof ProfileRoute
   ApiAwardGameTokensRoute: typeof ApiAwardGameTokensRoute
+  ApiBuyMovesRoute: typeof ApiBuyMovesRoute
   ApiCheckAccessRoute: typeof ApiCheckAccessRoute
   ApiClaimStreakRoute: typeof ApiClaimStreakRoute
   ApiProfileRoute: typeof ApiProfileRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCheckAccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/buy-moves': {
+      id: '/api/buy-moves'
+      path: '/api/buy-moves'
+      fullPath: '/api/buy-moves'
+      preLoaderRoute: typeof ApiBuyMovesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/award-game-tokens': {
       id: '/api/award-game-tokens'
       path: '/api/award-game-tokens'
@@ -239,6 +259,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProfileRoute: ProfileRoute,
   ApiAwardGameTokensRoute: ApiAwardGameTokensRoute,
+  ApiBuyMovesRoute: ApiBuyMovesRoute,
   ApiCheckAccessRoute: ApiCheckAccessRoute,
   ApiClaimStreakRoute: ApiClaimStreakRoute,
   ApiProfileRoute: ApiProfileRoute,
