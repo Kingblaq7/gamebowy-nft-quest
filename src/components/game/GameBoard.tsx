@@ -503,6 +503,55 @@ export function GameBoard({ chapter, level }: Props) {
         </div>
       </div>
 
+      {/* Combo flash banner */}
+      {comboFlash && (
+        <div
+          className="pointer-events-none absolute left-1/2 top-24 z-40 -translate-x-1/2 rounded-full bg-gradient-aurora px-5 py-2 font-display text-sm font-black text-background shadow-lg"
+          style={{ animation: "fade-in 0.2s ease-out" }}
+        >
+          {comboFlash}
+        </div>
+      )}
+
+      {/* Out of moves overlay (offer to buy) */}
+      {state === "outOfMoves" && (
+        <Overlay>
+          <Zap className="h-10 w-10 text-stardust" style={{ filter: "drop-shadow(0 0 16px currentColor)" }} />
+          <h2 className="font-display text-3xl font-black">Out of Moves</h2>
+          <p className="text-center text-sm text-muted-foreground">
+            Score: {score.toLocaleString()} · Keep going by buying more moves with GB tokens.
+          </p>
+          <button
+            type="button"
+            onClick={() => void buyMoves()}
+            disabled={buying}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-aurora px-5 py-3 font-bold text-background disabled:opacity-60"
+          >
+            <Coins className="h-4 w-4" />
+            {buying ? "Processing…" : `Buy ${BUY_MOVES_AMOUNT} Moves (${BUY_COST_GB} GB)`}
+          </button>
+          {buyError && (
+            <p className="text-center text-xs text-destructive">{buyError}</p>
+          )}
+          <div className="flex w-full gap-2">
+            <button
+              type="button"
+              onClick={giveUp}
+              className="flex-1 rounded-full border border-border/50 bg-card/40 px-4 py-3 text-sm font-semibold backdrop-blur"
+            >
+              End Run
+            </button>
+            <button
+              type="button"
+              onClick={restart}
+              className="flex-1 rounded-full border border-border/50 bg-card/40 px-4 py-3 text-sm font-semibold backdrop-blur"
+            >
+              Restart
+            </button>
+          </div>
+        </Overlay>
+      )}
+
       {/* Pause overlay */}
       {paused && state === "playing" && (
         <Overlay>
