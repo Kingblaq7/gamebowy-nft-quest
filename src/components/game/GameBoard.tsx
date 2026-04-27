@@ -177,7 +177,8 @@ export function GameBoard({ chapter, level }: Props) {
     if (objectiveMet) {
       void finishLevel(true, score);
     } else if (movesLeft <= 0) {
-      void finishLevel(false, score);
+      // Give the player a chance to buy more moves before finalizing.
+      setState("outOfMoves");
     }
   }, [movesLeft, busy, objectiveMet, score, state, finishLevel]);
 
