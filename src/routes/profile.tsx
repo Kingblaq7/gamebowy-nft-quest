@@ -47,6 +47,7 @@ function ProfilePage() {
     useWalletProfile(w.address);
   const [gateOpen, setGateOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [addrCopied, setAddrCopied] = useState(false);
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
 
@@ -80,6 +81,17 @@ function ProfilePage() {
       await navigator.clipboard.writeText(referralLink);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleCopyAddress = async () => {
+    if (!w.address) return;
+    try {
+      await navigator.clipboard.writeText(w.address);
+      setAddrCopied(true);
+      window.setTimeout(() => setAddrCopied(false), 1500);
     } catch {
       // ignore
     }
@@ -131,18 +143,37 @@ function ProfilePage() {
 
           {w.address ? (
             <>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <div className="rounded-2xl bg-background/40 px-4 py-2 font-mono text-sm">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 rounded-2xl bg-background/40 px-4 py-2 font-mono text-sm">
+                  <span className="h-7 w-7 shrink-0 rounded-full bg-gradient-aurora" aria-hidden />
                   {shortAddr(w.address)}
                 </div>
-                {w.isAdmin && (
+                <button
+                  onClick={handleCopyAddress}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/40 px-3 py-2 text-xs font-semibold transition-colors hover:bg-card/70"
+                  title="Copy full address"
+                >
+                  {addrCopied ? (
+                    <>
+                      <Check className="h-3.5 w-3.5" /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" /> Copy
+                    </>
+                  )}
+                </button>
+                {w.isAdmin ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-stardust/20 px-3 py-1 text-xs font-bold text-stardust">
-                    <Crown className="h-3 w-3" /> Admin
+                    <Crown className="h-3 w-3" /> Admin · Access Granted
                   </span>
-                )}
-                {w.paid && !w.isAdmin && (
+                ) : w.paid ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-aurora/20 px-3 py-1 text-xs font-bold text-aurora">
-                    <Sparkles className="h-3 w-3" /> Unlocked
+                    <Sparkles className="h-3 w-3" /> Access Granted
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-3 py-1 text-xs font-bold text-destructive">
+                    ❌ Not Paid Yet
                   </span>
                 )}
               </div>
