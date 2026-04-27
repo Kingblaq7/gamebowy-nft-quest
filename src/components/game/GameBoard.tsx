@@ -338,7 +338,46 @@ export function GameBoard({ chapter, level }: Props) {
     setLastChain(0);
     setPaused(false);
     setSelected(null);
+    setBuyError(null);
   };
+
+  const giveUp = useCallback(() => {
+    void finishLevel(false, score);
+  }, [finishLevel, score]);
+
+  const buyMoves = useCallback(async () => {
+    setBuyError(null);
+    if (!wallet.address) {
+      setBuyError("Connect your wallet first");
+      return;
+    }
+    setBuying(true);
+    try {
+      const res = await fetch("/api/buy-moves", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: wallet.address.toLowerCase() }),
+      });
+      const json = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        movesGranted?: number;
+        error?: string;
+      };
+      if (!res.ok || !json.ok) {
+        setBuyError(json.error ?? "Purchase failed");
+        return;
+      }
+      const granted = json.movesGranted ?? BUY_MOVES_AMOUNT;
+      setMovesLeft((m) => m + granted);
+      setState("playing");
+      setComboFlash(`+${granted} Moves!`);
+      window.setTimeout(() => setComboFlash(null), 1400);
+    } catch (e) {
+      setBuyError((e as Error).message ?? "Network error");
+    } finally {
+      setBuying(false);
+    }
+  }, [wallet.address]);
 
   const stars = computeStars(score);
 
