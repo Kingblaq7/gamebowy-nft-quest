@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Pause, RotateCcw, Sparkles, Star, Trophy, X } from "lucide-react";
+import { ArrowLeft, Coins, Pause, RotateCcw, Sparkles, Star, Trophy, X, Zap } from "lucide-react";
 import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@/game/chapters";
 import { useAudio } from "@/components/audio/AudioProvider";
 import { usePlayer } from "@/game/usePlayer";
+import { useWallet } from "@/web3/WalletProvider";
+
+const COMBO_THRESHOLD = 30; // points in single move > this = combo
+const COMBO_BONUS_MOVES = 2;
+const BUY_COST_GB = 10;
+const BUY_MOVES_AMOUNT = 30;
 
 type Cell = { type: number; key: number; matched?: boolean };
 type Board = Cell[][];
