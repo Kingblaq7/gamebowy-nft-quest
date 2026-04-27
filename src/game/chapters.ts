@@ -155,10 +155,10 @@ export const CHAPTERS: ChapterDef[] = [
     bgGradient: "linear-gradient(135deg, oklch(0.28 0.22 300), oklch(0.13 0.16 280))",
     rareReward: { tokens: 1500, nft: "Singularity Core" },
     levels: [
-      { num: 1, name: "Event Horizon", moves: 32, size: 7, objective: { kind: "score", target: 10000 }, starThresholds: [10000, 14000, 19000], reward: { tokens: 130, nft: "Horizon Shard" } },
-      { num: 2, name: "Gravity Lens", moves: 30, size: 7, objective: { kind: "collect", tileId: tile(0), count: 34 }, starThresholds: [11000, 15500, 21000], reward: { tokens: 150, nft: "Lens Crystal" } },
-      { num: 3, name: "Time Loop", moves: 30, size: 8, objective: { kind: "combo", count: 14 }, starThresholds: [13000, 18000, 25000], reward: { tokens: 175, nft: "Loop Sigil" } },
-      { num: 4, name: "Singularity", moves: 34, size: 8, objective: { kind: "score", target: 20000 }, starThresholds: [20000, 28000, 38000], reward: { tokens: 250, nft: "Singularity Crown" } },
+      { num: 1, name: "Event Horizon", moves: 12, size: 7, objective: { kind: "score", target: 10000 }, starThresholds: [10000, 14000, 19000], reward: { tokens: 130, nft: "Horizon Shard" } },
+      { num: 2, name: "Gravity Lens", moves: 10, size: 7, objective: { kind: "collect", tileId: tile(0), count: 34 }, starThresholds: [11000, 15500, 21000], reward: { tokens: 150, nft: "Lens Crystal" } },
+      { num: 3, name: "Time Loop", moves: 10, size: 8, objective: { kind: "combo", count: 14 }, starThresholds: [13000, 18000, 25000], reward: { tokens: 175, nft: "Loop Sigil" } },
+      { num: 4, name: "Singularity", moves: 14, size: 8, objective: { kind: "score", target: 20000 }, starThresholds: [20000, 28000, 38000], reward: { tokens: 250, nft: "Singularity Crown" } },
     ],
   },
 ];
