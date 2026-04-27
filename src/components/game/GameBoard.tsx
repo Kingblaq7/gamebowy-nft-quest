@@ -105,7 +105,7 @@ interface Props {
   level: LevelDef;
 }
 
-type GameState = "playing" | "won" | "lost";
+type GameState = "playing" | "won" | "lost" | "outOfMoves";
 
 export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
