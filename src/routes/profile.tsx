@@ -86,6 +86,17 @@ function ProfilePage() {
     }
   };
 
+  const handleCopyAddress = async () => {
+    if (!w.address) return;
+    try {
+      await navigator.clipboard.writeText(w.address);
+      setAddrCopied(true);
+      window.setTimeout(() => setAddrCopied(false), 1500);
+    } catch {
+      // ignore
+    }
+  };
+
   const handleClaim = async () => {
     setClaimMsg(null);
     const r = await claim();
