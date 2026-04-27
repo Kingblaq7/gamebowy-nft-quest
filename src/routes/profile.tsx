@@ -47,6 +47,7 @@ function ProfilePage() {
     useWalletProfile(w.address);
   const [gateOpen, setGateOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [addrCopied, setAddrCopied] = useState(false);
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
 
