@@ -5,6 +5,7 @@ import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@
 import { useAudio } from "@/components/audio/AudioProvider";
 import { usePlayer } from "@/game/usePlayer";
 import { useWallet } from "@/web3/WalletProvider";
+import { useGbBalance } from "@/game/useGbBalance";
 
 const COMBO_THRESHOLD = 30; // points in single move > this = combo
 const COMBO_BONUS_MOVES = 2;
