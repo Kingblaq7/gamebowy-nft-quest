@@ -20,6 +20,7 @@ import {
   previewNextReward,
 } from "@/web3/useWalletProfile";
 import { WalletGateModal } from "@/web3/WalletGateModal";
+import { useGbBalance } from "@/game/useGbBalance";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
