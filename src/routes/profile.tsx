@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Wallet,
@@ -20,6 +20,7 @@ import {
   previewNextReward,
 } from "@/web3/useWalletProfile";
 import { WalletGateModal } from "@/web3/WalletGateModal";
+import { useGbBalance } from "@/game/useGbBalance";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -45,11 +46,13 @@ function ProfilePage() {
   const w = useWallet();
   const { profile, referrals, loading, claiming, error, refresh, claim } =
     useWalletProfile(w.address);
+  const gb = useGbBalance();
   const [gateOpen, setGateOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [addrCopied, setAddrCopied] = useState(false);
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
+  const prevReferralsRef = useRef<number | null>(null);
 
   // Tick every minute for the countdown
   useEffect(() => {
@@ -101,11 +104,29 @@ function ProfilePage() {
     setClaimMsg(null);
     const r = await claim();
     if (r.ok) {
+      if (r.reward && r.reward > 0) gb.add(r.reward);
       setClaimMsg(`+${r.reward?.toFixed(3)} GB claimed 🎉`);
     } else {
       setClaimMsg(r.error ?? "Claim failed");
     }
   };
+
+  // Credit the local balance when new referral rewards arrive from backend.
+  useEffect(() => {
+    const count = referrals?.count ?? null;
+    if (count === null) return;
+    if (prevReferralsRef.current === null) {
+      prevReferralsRef.current = count;
+      return;
+    }
+    if (count > prevReferralsRef.current) {
+      const newRefs = count - prevReferralsRef.current;
+      gb.add(newRefs * 10);
+      prevReferralsRef.current = count;
+    } else {
+      prevReferralsRef.current = count;
+    }
+  }, [referrals?.count, gb]);
 
   return (
     <main
@@ -181,7 +202,7 @@ function ProfilePage() {
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <Stat
                   label="GB Balance"
-                  value={profile ? profile.gb_balance.toFixed(3) : "—"}
+                  value={gb.balance.toFixed(3)}
                 />
                 <Stat
                   label="Network"
