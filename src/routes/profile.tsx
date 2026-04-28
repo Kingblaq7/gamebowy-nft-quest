@@ -202,7 +202,7 @@ function ProfilePage() {
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <Stat
                   label="GB Balance"
-                  value={profile ? profile.gb_balance.toFixed(3) : "—"}
+                  value={gb.balance.toFixed(3)}
                 />
                 <Stat
                   label="Network"
