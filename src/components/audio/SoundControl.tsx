@@ -89,7 +89,7 @@ export function SoundControl() {
           </label>
 
           <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">
-            Includes match pops, swap whooshes & deep-space ambience pad.
+            Bubble match pops only.
           </p>
         </div>
       )}
