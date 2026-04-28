@@ -5,6 +5,7 @@ import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@
 import { useAudio } from "@/components/audio/AudioProvider";
 import { usePlayer } from "@/game/usePlayer";
 import { useWallet } from "@/web3/WalletProvider";
+import { useGbBalance } from "@/game/useGbBalance";
 
 const COMBO_THRESHOLD = 30; // points in single move > this = combo
 const COMBO_BONUS_MOVES = 2;
@@ -112,6 +113,7 @@ export function GameBoard({ chapter, level }: Props) {
   const { playMatch, playSwap, playPowerup } = useAudio();
   const { submitLevel, profile } = usePlayer();
   const wallet = useWallet();
+  const gb = useGbBalance();
 
   const [board, setBoard] = useState<Board>(() => makeBoard(level.size, level.tilePool));
   const [score, setScore] = useState(0);
@@ -165,9 +167,10 @@ export function GameBoard({ chapter, level }: Props) {
       const stars = won ? Math.max(1, computeStars(finalScore)) : computeStars(finalScore);
       const tokens = won ? level.reward.tokens : 0;
       setState(won ? "won" : "lost");
+      if (tokens > 0) gb.add(tokens);
       await submitLevel(chapter.num, level.num, finalScore, stars, won, tokens);
     },
-    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel]
+    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel, gb]
   );
 
   // After moves run out, decide outcome
@@ -347,37 +350,23 @@ export function GameBoard({ chapter, level }: Props) {
 
   const buyMoves = useCallback(async () => {
     setBuyError(null);
-    if (!wallet.address) {
-      setBuyError("Connect your wallet first");
-      return;
-    }
     setBuying(true);
     try {
-      const res = await fetch("/api/buy-moves", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: wallet.address.toLowerCase() }),
-      });
-      const json = (await res.json().catch(() => ({}))) as {
-        ok?: boolean;
-        movesGranted?: number;
-        error?: string;
-      };
-      if (!res.ok || !json.ok) {
-        setBuyError(json.error ?? "Purchase failed");
+      const ok = gb.spend(BUY_COST_GB);
+      if (!ok) {
+        setBuyError(`Not enough GB tokens. You have ${gb.balance} GB.`);
         return;
       }
-      const granted = json.movesGranted ?? BUY_MOVES_AMOUNT;
-      setMovesLeft((m) => m + granted);
+      setMovesLeft((m) => m + BUY_MOVES_AMOUNT);
       setState("playing");
-      setComboFlash(`+${granted} Moves!`);
+      setComboFlash(`+${BUY_MOVES_AMOUNT} Moves!`);
       window.setTimeout(() => setComboFlash(null), 1400);
     } catch (e) {
-      setBuyError((e as Error).message ?? "Network error");
+      setBuyError((e as Error).message ?? "Purchase failed");
     } finally {
       setBuying(false);
     }
-  }, [wallet.address]);
+  }, [gb]);
 
   const stars = computeStars(score);
 
@@ -521,10 +510,13 @@ export function GameBoard({ chapter, level }: Props) {
           <p className="text-center text-sm text-muted-foreground">
             Score: {score.toLocaleString()} · Keep going by buying more moves with GB tokens.
           </p>
+          <p className="text-center text-xs text-muted-foreground">
+            Balance: <span className="font-bold text-stardust">{gb.balance} GB</span>
+          </p>
           <button
             type="button"
             onClick={() => void buyMoves()}
-            disabled={buying}
+            disabled={buying || gb.balance < BUY_COST_GB}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-aurora px-5 py-3 font-bold text-background disabled:opacity-60"
           >
             <Coins className="h-4 w-4" />
