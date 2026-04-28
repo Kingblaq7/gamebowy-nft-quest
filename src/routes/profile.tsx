@@ -46,11 +46,13 @@ function ProfilePage() {
   const w = useWallet();
   const { profile, referrals, loading, claiming, error, refresh, claim } =
     useWalletProfile(w.address);
+  const gb = useGbBalance();
   const [gateOpen, setGateOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [addrCopied, setAddrCopied] = useState(false);
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
+  const prevReferralsRef = useRef<number | null>(null);
 
   // Tick every minute for the countdown
   useEffect(() => {
