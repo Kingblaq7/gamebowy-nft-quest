@@ -111,80 +111,20 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     [enabled, ensureCtx]
   );
 
+  // Swap sound removed — only the bubble (match) sound remains.
   const playSwap = useCallback(() => {
-    if (!enabled) return;
-    const ac = ensureCtx();
-    if (!ac || !masterRef.current) return;
-    const t = ac.currentTime;
-    const osc = ac.createOscillator();
-    const gain = ac.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(380, t);
-    osc.frequency.exponentialRampToValueAtTime(620, t + 0.12);
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(0.18, t + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
-    osc.connect(gain).connect(masterRef.current);
-    osc.start(t);
-    osc.stop(t + 0.18);
-  }, [enabled, ensureCtx]);
+    /* disabled */
+  }, []);
 
+  // Powerup sound removed — only the bubble (match) sound remains.
   const playPowerup = useCallback(() => {
-    if (!enabled) return;
-    const ac = ensureCtx();
-    if (!ac || !masterRef.current) return;
-    const t = ac.currentTime;
-    const notes = [440, 660, 880, 1320];
-    notes.forEach((f, i) => {
-      const osc = ac.createOscillator();
-      const g = ac.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(f, t + i * 0.06);
-      g.gain.setValueAtTime(0, t + i * 0.06);
-      g.gain.linearRampToValueAtTime(0.22, t + i * 0.06 + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.06 + 0.3);
-      osc.connect(g).connect(masterRef.current!);
-      osc.start(t + i * 0.06);
-      osc.stop(t + i * 0.06 + 0.32);
-    });
-  }, [enabled, ensureCtx]);
+    /* disabled */
+  }, []);
 
+  // Ambience pad (the low-frequency "vibration" drone) removed.
   const startAmbience = useCallback(() => {
-    if (!enabled) return;
-    if (ambienceRef.current) return;
-    const ac = ensureCtx();
-    if (!ac || !masterRef.current) return;
-
-    const ambGain = ac.createGain();
-    ambGain.gain.value = 0;
-    ambGain.connect(masterRef.current);
-    ambGain.gain.linearRampToValueAtTime(0.18, ac.currentTime + 1.5);
-
-    // Two slow detuned sines = pad
-    const freqs = [110, 165, 220];
-    const nodes: AudioNode[] = [ambGain];
-    freqs.forEach((f, i) => {
-      const osc = ac.createOscillator();
-      osc.type = "sine";
-      osc.frequency.value = f;
-      const lfo = ac.createOscillator();
-      const lfoGain = ac.createGain();
-      lfo.frequency.value = 0.08 + i * 0.05;
-      lfoGain.gain.value = 1.5;
-      lfo.connect(lfoGain).connect(osc.frequency);
-      const filt = ac.createBiquadFilter();
-      filt.type = "lowpass";
-      filt.frequency.value = 800;
-      const g = ac.createGain();
-      g.gain.value = 0.25;
-      osc.connect(filt).connect(g).connect(ambGain);
-      osc.start();
-      lfo.start();
-      nodes.push(osc, lfo, lfoGain, filt, g);
-    });
-
-    ambienceRef.current = { nodes, gain: ambGain };
-  }, [enabled, ensureCtx]);
+    /* disabled */
+  }, []);
 
   const stopAmbience = useCallback(() => {
     const amb = ambienceRef.current;
