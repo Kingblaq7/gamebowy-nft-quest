@@ -104,11 +104,29 @@ function ProfilePage() {
     setClaimMsg(null);
     const r = await claim();
     if (r.ok) {
+      if (r.reward && r.reward > 0) gb.add(r.reward);
       setClaimMsg(`+${r.reward?.toFixed(3)} GB claimed 🎉`);
     } else {
       setClaimMsg(r.error ?? "Claim failed");
     }
   };
+
+  // Credit the local balance when new referral rewards arrive from backend.
+  useEffect(() => {
+    const count = referrals?.count ?? null;
+    if (count === null) return;
+    if (prevReferralsRef.current === null) {
+      prevReferralsRef.current = count;
+      return;
+    }
+    if (count > prevReferralsRef.current) {
+      const newRefs = count - prevReferralsRef.current;
+      gb.add(newRefs * 10);
+      prevReferralsRef.current = count;
+    } else {
+      prevReferralsRef.current = count;
+    }
+  }, [referrals?.count, gb]);
 
   return (
     <main
