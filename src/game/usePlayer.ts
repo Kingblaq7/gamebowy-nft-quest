@@ -1,12 +1,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  ensurePlayer,
+  submitLevelResult,
+  updatePlayerName,
+} from "@/server/players.functions";
 
 const PLAYER_ID_KEY = "gb_player_id";
 const PLAYER_NAME_KEY = "gb_player_name";
 
 function genUUID(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
-  // RFC4122 v4 fallback
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
     const v = c === "x" ? r : (r & 0x3) | 0x8;
@@ -36,7 +40,7 @@ export type LevelProgressRow = {
   plays: number;
 };
 
-export type ProgressMap = Record<string, LevelProgressRow>; // key `${chapter}-${level}`
+export type ProgressMap = Record<string, LevelProgressRow>;
 
 const progressKey = (c: number, l: number) => `${c}-${l}`;
 
@@ -58,27 +62,12 @@ async function bootstrapPlayer(): Promise<PlayerProfile> {
       localStorage.setItem(PLAYER_NAME_KEY, name);
     }
 
-    // Try to fetch existing
-    const { data: existing } = await supabase
-      .from("players")
-      .select("id, display_name, total_score, gb_tokens")
-      .eq("id", id)
-      .maybeSingle();
-
-    if (existing) return existing as PlayerProfile;
-
-    // Create row
-    const { data: created, error } = await supabase
-      .from("players")
-      .insert({ id, display_name: name })
-      .select("id, display_name, total_score, gb_tokens")
-      .single();
-
-    if (error || !created) {
-      // Network or RLS issue: fall back to local-only profile
+    try {
+      const profile = await ensurePlayer({ data: { id, display_name: name } });
+      return profile as PlayerProfile;
+    } catch {
       return { id, display_name: name, total_score: 0, gb_tokens: 0 };
     }
-    return created as PlayerProfile;
   })();
   return bootPromise;
 }
@@ -112,49 +101,47 @@ export function usePlayer() {
       if (!profile) return;
       const key = progressKey(chapter, level);
       const prev = progress[key];
-      const bestScore = Math.max(prev?.best_score ?? 0, score);
-      const bestStars = Math.max(prev?.stars ?? 0, stars);
-      const wasCompleted = prev?.completed ?? false;
-      const nowCompleted = wasCompleted || completed;
-      const plays = (prev?.plays ?? 0) + 1;
 
-      // Optimistic
-      const updatedRow: LevelProgressRow = {
+      // Optimistic UI update
+      const optimistic: LevelProgressRow = {
         chapter_num: chapter,
         level_num: level,
-        best_score: bestScore,
-        stars: bestStars,
-        completed: nowCompleted,
-        plays,
+        best_score: Math.max(prev?.best_score ?? 0, score),
+        stars: Math.max(prev?.stars ?? 0, stars),
+        completed: (prev?.completed ?? false) || completed,
+        plays: (prev?.plays ?? 0) + 1,
       };
-      setProgress((m) => ({ ...m, [key]: updatedRow }));
+      setProgress((m) => ({ ...m, [key]: optimistic }));
 
-      // Upsert level progress
-      await supabase.from("level_progress").upsert(
-        {
-          player_id: profile.id,
-          chapter_num: chapter,
-          level_num: level,
-          best_score: bestScore,
-          stars: bestStars,
-          completed: nowCompleted,
-          plays,
-          last_played_at: new Date().toISOString(),
-        },
-        { onConflict: "player_id,chapter_num,level_num" }
-      );
-
-      // Add tokens + score (only on first completion award full tokens; else half)
-      const tokenDelta = wasCompleted ? Math.floor(tokensEarned / 2) : tokensEarned;
-      const newTotal = profile.total_score + Math.max(0, score - (prev?.best_score ?? 0));
-      const newTokens = profile.gb_tokens + tokenDelta;
-      setProfile({ ...profile, total_score: newTotal, gb_tokens: newTokens });
-      await supabase
-        .from("players")
-        .update({ total_score: newTotal, gb_tokens: newTokens })
-        .eq("id", profile.id);
-
-      return { tokenDelta, newBest: bestScore > (prev?.best_score ?? 0), firstClear: !wasCompleted && completed };
+      try {
+        const res = await submitLevelResult({
+          data: {
+            player_id: profile.id,
+            chapter,
+            level,
+            score,
+            stars,
+            completed,
+            tokens_earned: tokensEarned,
+          },
+        });
+        setProfile({ ...profile, total_score: res.total_score, gb_tokens: res.gb_tokens });
+        setProgress((m) => ({
+          ...m,
+          [key]: {
+            chapter_num: chapter,
+            level_num: level,
+            best_score: res.best_score,
+            stars: res.stars,
+            completed: res.completed,
+            plays: res.plays,
+          },
+        }));
+        return { tokenDelta: res.tokenDelta, newBest: res.newBest, firstClear: res.firstClear };
+      } catch (e) {
+        console.error("submitLevel failed", e);
+        return { tokenDelta: 0, newBest: false, firstClear: false };
+      }
     },
     [profile, progress]
   );
@@ -165,7 +152,11 @@ export function usePlayer() {
       if (!trimmed || !profile) return;
       localStorage.setItem(PLAYER_NAME_KEY, trimmed);
       setProfile({ ...profile, display_name: trimmed });
-      await supabase.from("players").update({ display_name: trimmed }).eq("id", profile.id);
+      try {
+        await updatePlayerName({ data: { id: profile.id, display_name: trimmed } });
+      } catch (e) {
+        console.error("updateName failed", e);
+      }
     },
     [profile]
   );
@@ -175,9 +166,7 @@ export function usePlayer() {
 
 export function isLevelUnlocked(progress: ProgressMap, chapter: number, level: number): boolean {
   if (chapter === 1 && level === 1) return true;
-  // Previous level same chapter
   if (level > 1) return !!progress[progressKey(chapter, level - 1)]?.completed;
-  // Previous chapter's last level
   const prevLast = progress[progressKey(chapter - 1, 4)];
   return !!prevLast?.completed;
 }
