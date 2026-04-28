@@ -509,10 +509,13 @@ export function GameBoard({ chapter, level }: Props) {
           <p className="text-center text-sm text-muted-foreground">
             Score: {score.toLocaleString()} · Keep going by buying more moves with GB tokens.
           </p>
+          <p className="text-center text-xs text-muted-foreground">
+            Balance: <span className="font-bold text-stardust">{gb.balance} GB</span>
+          </p>
           <button
             type="button"
             onClick={() => void buyMoves()}
-            disabled={buying}
+            disabled={buying || gb.balance < BUY_COST_GB}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-aurora px-5 py-3 font-bold text-background disabled:opacity-60"
           >
             <Coins className="h-4 w-4" />
