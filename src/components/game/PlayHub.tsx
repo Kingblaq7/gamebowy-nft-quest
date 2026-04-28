@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Coins, Lock, Star, Trophy } from "lucide-react";
+import { ArrowLeft, Lock, Star, Trophy } from "lucide-react";
 import { CHAPTERS, describeObjective } from "@/game/chapters";
 import { isChapterUnlocked, isLevelUnlocked, usePlayer } from "@/game/usePlayer";
 import { StarField } from "@/components/StarField";
@@ -25,9 +25,6 @@ export function PlayHub() {
             <div className="rounded-full border border-border/50 bg-card/40 px-3 py-1.5 backdrop-blur">
               <span className="text-muted-foreground">Pilot · </span>
               <span className="font-semibold">{profile.display_name}</span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-full bg-gradient-aurora px-3 py-1.5 font-bold text-background">
-              <Coins className="h-3.5 w-3.5" /> {profile.gb_tokens} GB
             </div>
           </div>
         )}
