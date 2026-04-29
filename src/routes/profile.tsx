@@ -49,6 +49,7 @@ function ProfilePage() {
   const gb = useGbBalance();
   const [gateOpen, setGateOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
   const [addrCopied, setAddrCopied] = useState(false);
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
@@ -60,11 +61,12 @@ function ProfilePage() {
     return () => window.clearInterval(id);
   }, []);
 
+  const referralCode = profile?.referral_code ?? "";
   const referralLink = useMemo(() => {
-    if (!w.address || typeof window === "undefined") return "";
-    const base = `${window.location.origin}/`;
-    return `${base}?ref=${w.address.toLowerCase()}`;
-  }, [w.address]);
+    if (typeof window === "undefined") return "";
+    if (!referralCode) return "";
+    return `${window.location.origin}/?ref=${referralCode}`;
+  }, [referralCode]);
 
   const claimedToday = isClaimedToday(profile);
   const nextReward = previewNextReward(profile);
@@ -84,6 +86,17 @@ function ProfilePage() {
       await navigator.clipboard.writeText(referralLink);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleCopyCode = async () => {
+    if (!referralCode) return;
+    try {
+      await navigator.clipboard.writeText(referralCode);
+      setCodeCopied(true);
+      window.setTimeout(() => setCodeCopied(false), 1500);
     } catch {
       // ignore
     }
@@ -320,32 +333,68 @@ function ProfilePage() {
             </div>
 
             <p className="mt-4 text-xs text-muted-foreground">
-              Share your link. You earn{" "}
-              <span className="font-bold text-foreground">10 GB</span> for every
-              new wallet that connects through it.
+              Share your code. You earn{" "}
+              <span className="font-bold text-foreground">10 GB</span> per new
+              wallet, and friends get{" "}
+              <span className="font-bold text-foreground">5 GB</span> as a
+              welcome bonus.
             </p>
 
-            <div className="mt-2 flex items-stretch gap-2">
-              <input
-                readOnly
-                value={referralLink}
-                className="min-w-0 flex-1 truncate rounded-2xl border border-border/40 bg-background/40 px-3 py-2 font-mono text-xs"
-                onFocus={(e) => e.currentTarget.select()}
-              />
-              <button
-                onClick={handleCopy}
-                className="inline-flex items-center gap-1.5 rounded-2xl bg-gradient-aurora px-4 text-xs font-bold text-background"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-3.5 w-3.5" /> Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3.5 w-3.5" /> Copy
-                  </>
-                )}
-              </button>
+            {/* Referral code */}
+            <div className="mt-3">
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                Your code
+              </div>
+              <div className="mt-1 flex items-stretch gap-2">
+                <div className="flex min-w-0 flex-1 items-center rounded-2xl border border-border/40 bg-background/40 px-4 py-2 font-display text-xl font-black tracking-[0.25em]">
+                  {referralCode || "—"}
+                </div>
+                <button
+                  onClick={handleCopyCode}
+                  disabled={!referralCode}
+                  className="inline-flex items-center gap-1.5 rounded-2xl border border-border/60 bg-card/40 px-4 text-xs font-semibold transition-colors hover:bg-card/70 disabled:opacity-50"
+                >
+                  {codeCopied ? (
+                    <>
+                      <Check className="h-3.5 w-3.5" /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" /> Copy code
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Referral link */}
+            <div className="mt-3">
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                Your link
+              </div>
+              <div className="mt-1 flex items-stretch gap-2">
+                <input
+                  readOnly
+                  value={referralLink}
+                  className="min-w-0 flex-1 truncate rounded-2xl border border-border/40 bg-background/40 px-3 py-2 font-mono text-xs"
+                  onFocus={(e) => e.currentTarget.select()}
+                />
+                <button
+                  onClick={handleCopy}
+                  disabled={!referralLink}
+                  className="inline-flex items-center gap-1.5 rounded-2xl bg-gradient-aurora px-4 text-xs font-bold text-background disabled:opacity-50"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-3.5 w-3.5" /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" /> Copy link
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             {profile?.referred_by && (

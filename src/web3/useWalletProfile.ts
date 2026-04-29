@@ -9,6 +9,7 @@ export type WalletProfile = {
   referred_by: string | null;
   total_referrals: number;
   referral_rewards: number;
+  referral_code: string | null;
 };
 
 export type ReferralStats = {
