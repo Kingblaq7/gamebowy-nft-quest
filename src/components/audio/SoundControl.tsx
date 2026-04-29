@@ -3,7 +3,7 @@ import { Volume2, VolumeX } from "lucide-react";
 import { useAudio } from "./AudioProvider";
 
 export function SoundControl() {
-  const { enabled, volume, setEnabled, setVolume, startAmbience, stopAmbience, playMatch } = useAudio();
+  const { enabled, volume, setEnabled, setVolume, startAmbience, stopAmbience } = useAudio();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -21,7 +21,6 @@ export function SoundControl() {
     setEnabled(next);
     if (next) {
       startAmbience();
-      playMatch(0); // little confirmation pop
     } else {
       stopAmbience();
     }
@@ -89,7 +88,7 @@ export function SoundControl() {
           </label>
 
           <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">
-            Bubble match pops only.
+            Chiptune gaming melody.
           </p>
         </div>
       )}
