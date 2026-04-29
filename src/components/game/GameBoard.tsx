@@ -110,7 +110,13 @@ type GameState = "playing" | "won" | "lost" | "outOfMoves";
 
 export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
-  const { playMatch, playSwap, playPowerup } = useAudio();
+  const { playMatch, playSwap, playPowerup, setTrack } = useAudio();
+
+  // Per-chapter music: start on mount, stop on unmount (no music outside the game)
+  useEffect(() => {
+    setTrack(chapter.num);
+    return () => setTrack(null);
+  }, [chapter.num, setTrack]);
   const { submitLevel, profile } = usePlayer();
   const wallet = useWallet();
   const gb = useGbBalance();
