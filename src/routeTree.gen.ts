@@ -20,6 +20,7 @@ import { Route as ApiClaimStreakRouteImport } from './routes/api/claim-streak'
 import { Route as ApiCheckAccessRouteImport } from './routes/api/check-access'
 import { Route as ApiBuyMovesRouteImport } from './routes/api/buy-moves'
 import { Route as PlayChapterLevelRouteImport } from './routes/play.$chapter.$level'
+import { Route as ApiAdminRegisteredWalletsRouteImport } from './routes/api/admin/registered-wallets'
 
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
@@ -76,6 +77,12 @@ const PlayChapterLevelRoute = PlayChapterLevelRouteImport.update({
   path: '/play/$chapter/$level',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminRegisteredWalletsRoute =
+  ApiAdminRegisteredWalletsRouteImport.update({
+    id: '/api/admin/registered-wallets',
+    path: '/api/admin/registered-wallets',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/api/register-wallet': typeof ApiRegisterWalletRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
+  '/api/admin/registered-wallets': typeof ApiAdminRegisteredWalletsRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +109,7 @@ export interface FileRoutesByTo {
   '/api/register-wallet': typeof ApiRegisterWalletRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play': typeof PlayIndexRoute
+  '/api/admin/registered-wallets': typeof ApiAdminRegisteredWalletsRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesById {
@@ -115,6 +124,7 @@ export interface FileRoutesById {
   '/api/register-wallet': typeof ApiRegisterWalletRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
+  '/api/admin/registered-wallets': typeof ApiAdminRegisteredWalletsRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/api/register-wallet'
     | '/api/verify-transaction'
     | '/play/'
+    | '/api/admin/registered-wallets'
     | '/play/$chapter/$level'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/api/register-wallet'
     | '/api/verify-transaction'
     | '/play'
+    | '/api/admin/registered-wallets'
     | '/play/$chapter/$level'
   id:
     | '__root__'
@@ -156,6 +168,7 @@ export interface FileRouteTypes {
     | '/api/register-wallet'
     | '/api/verify-transaction'
     | '/play/'
+    | '/api/admin/registered-wallets'
     | '/play/$chapter/$level'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +183,7 @@ export interface RootRouteChildren {
   ApiRegisterWalletRoute: typeof ApiRegisterWalletRoute
   ApiVerifyTransactionRoute: typeof ApiVerifyTransactionRoute
   PlayIndexRoute: typeof PlayIndexRoute
+  ApiAdminRegisteredWalletsRoute: typeof ApiAdminRegisteredWalletsRoute
   PlayChapterLevelRoute: typeof PlayChapterLevelRoute
 }
 
@@ -252,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayChapterLevelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/registered-wallets': {
+      id: '/api/admin/registered-wallets'
+      path: '/api/admin/registered-wallets'
+      fullPath: '/api/admin/registered-wallets'
+      preLoaderRoute: typeof ApiAdminRegisteredWalletsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -266,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiRegisterWalletRoute: ApiRegisterWalletRoute,
   ApiVerifyTransactionRoute: ApiVerifyTransactionRoute,
   PlayIndexRoute: PlayIndexRoute,
+  ApiAdminRegisteredWalletsRoute: ApiAdminRegisteredWalletsRoute,
   PlayChapterLevelRoute: PlayChapterLevelRoute,
 }
 export const routeTree = rootRouteImport
