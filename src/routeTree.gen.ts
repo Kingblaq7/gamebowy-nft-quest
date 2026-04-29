@@ -10,19 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as ApiVerifyTransactionRouteImport } from './routes/api/verify-transaction'
+import { Route as ApiRegisterWalletRouteImport } from './routes/api/register-wallet'
 import { Route as ApiReferralsRouteImport } from './routes/api/referrals'
 import { Route as ApiProfileRouteImport } from './routes/api/profile'
 import { Route as ApiClaimStreakRouteImport } from './routes/api/claim-streak'
 import { Route as ApiCheckAccessRouteImport } from './routes/api/check-access'
 import { Route as ApiBuyMovesRouteImport } from './routes/api/buy-moves'
 import { Route as PlayChapterLevelRouteImport } from './routes/play.$chapter.$level'
+import { Route as ApiAdminRegisteredWalletsRouteImport } from './routes/api/admin/registered-wallets'
 
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -38,6 +46,11 @@ const PlayIndexRoute = PlayIndexRouteImport.update({
 const ApiVerifyTransactionRoute = ApiVerifyTransactionRouteImport.update({
   id: '/api/verify-transaction',
   path: '/api/verify-transaction',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRegisterWalletRoute = ApiRegisterWalletRouteImport.update({
+  id: '/api/register-wallet',
+  path: '/api/register-wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiReferralsRoute = ApiReferralsRouteImport.update({
@@ -70,93 +83,120 @@ const PlayChapterLevelRoute = PlayChapterLevelRouteImport.update({
   path: '/play/$chapter/$level',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminRegisteredWalletsRoute =
+  ApiAdminRegisteredWalletsRouteImport.update({
+    id: '/api/admin/registered-wallets',
+    path: '/api/admin/registered-wallets',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/profile': typeof ProfileRoute
   '/api/buy-moves': typeof ApiBuyMovesRoute
   '/api/check-access': typeof ApiCheckAccessRoute
   '/api/claim-streak': typeof ApiClaimStreakRoute
   '/api/profile': typeof ApiProfileRoute
   '/api/referrals': typeof ApiReferralsRoute
+  '/api/register-wallet': typeof ApiRegisterWalletRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
+  '/api/admin/registered-wallets': typeof ApiAdminRegisteredWalletsRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/profile': typeof ProfileRoute
   '/api/buy-moves': typeof ApiBuyMovesRoute
   '/api/check-access': typeof ApiCheckAccessRoute
   '/api/claim-streak': typeof ApiClaimStreakRoute
   '/api/profile': typeof ApiProfileRoute
   '/api/referrals': typeof ApiReferralsRoute
+  '/api/register-wallet': typeof ApiRegisterWalletRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play': typeof PlayIndexRoute
+  '/api/admin/registered-wallets': typeof ApiAdminRegisteredWalletsRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/profile': typeof ProfileRoute
   '/api/buy-moves': typeof ApiBuyMovesRoute
   '/api/check-access': typeof ApiCheckAccessRoute
   '/api/claim-streak': typeof ApiClaimStreakRoute
   '/api/profile': typeof ApiProfileRoute
   '/api/referrals': typeof ApiReferralsRoute
+  '/api/register-wallet': typeof ApiRegisterWalletRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
+  '/api/admin/registered-wallets': typeof ApiAdminRegisteredWalletsRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/profile'
     | '/api/buy-moves'
     | '/api/check-access'
     | '/api/claim-streak'
     | '/api/profile'
     | '/api/referrals'
+    | '/api/register-wallet'
     | '/api/verify-transaction'
     | '/play/'
+    | '/api/admin/registered-wallets'
     | '/play/$chapter/$level'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/profile'
     | '/api/buy-moves'
     | '/api/check-access'
     | '/api/claim-streak'
     | '/api/profile'
     | '/api/referrals'
+    | '/api/register-wallet'
     | '/api/verify-transaction'
     | '/play'
+    | '/api/admin/registered-wallets'
     | '/play/$chapter/$level'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/profile'
     | '/api/buy-moves'
     | '/api/check-access'
     | '/api/claim-streak'
     | '/api/profile'
     | '/api/referrals'
+    | '/api/register-wallet'
     | '/api/verify-transaction'
     | '/play/'
+    | '/api/admin/registered-wallets'
     | '/play/$chapter/$level'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   ProfileRoute: typeof ProfileRoute
   ApiBuyMovesRoute: typeof ApiBuyMovesRoute
   ApiCheckAccessRoute: typeof ApiCheckAccessRoute
   ApiClaimStreakRoute: typeof ApiClaimStreakRoute
   ApiProfileRoute: typeof ApiProfileRoute
   ApiReferralsRoute: typeof ApiReferralsRoute
+  ApiRegisterWalletRoute: typeof ApiRegisterWalletRoute
   ApiVerifyTransactionRoute: typeof ApiVerifyTransactionRoute
   PlayIndexRoute: typeof PlayIndexRoute
+  ApiAdminRegisteredWalletsRoute: typeof ApiAdminRegisteredWalletsRoute
   PlayChapterLevelRoute: typeof PlayChapterLevelRoute
 }
 
@@ -167,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -188,6 +235,13 @@ declare module '@tanstack/react-router' {
       path: '/api/verify-transaction'
       fullPath: '/api/verify-transaction'
       preLoaderRoute: typeof ApiVerifyTransactionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/register-wallet': {
+      id: '/api/register-wallet'
+      path: '/api/register-wallet'
+      fullPath: '/api/register-wallet'
+      preLoaderRoute: typeof ApiRegisterWalletRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/referrals': {
@@ -232,19 +286,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayChapterLevelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/registered-wallets': {
+      id: '/api/admin/registered-wallets'
+      path: '/api/admin/registered-wallets'
+      fullPath: '/api/admin/registered-wallets'
+      preLoaderRoute: typeof ApiAdminRegisteredWalletsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   ProfileRoute: ProfileRoute,
   ApiBuyMovesRoute: ApiBuyMovesRoute,
   ApiCheckAccessRoute: ApiCheckAccessRoute,
   ApiClaimStreakRoute: ApiClaimStreakRoute,
   ApiProfileRoute: ApiProfileRoute,
   ApiReferralsRoute: ApiReferralsRoute,
+  ApiRegisterWalletRoute: ApiRegisterWalletRoute,
   ApiVerifyTransactionRoute: ApiVerifyTransactionRoute,
   PlayIndexRoute: PlayIndexRoute,
+  ApiAdminRegisteredWalletsRoute: ApiAdminRegisteredWalletsRoute,
   PlayChapterLevelRoute: PlayChapterLevelRoute,
 }
 export const routeTree = rootRouteImport

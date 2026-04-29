@@ -157,6 +157,36 @@ export type Database = {
         }
         Relationships: []
       }
+      registered_wallets: {
+        Row: {
+          created_at: string
+          current_level: number
+          gb_token_balance: number
+          id: string
+          referral_count: number
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          current_level?: number
+          gb_token_balance?: number
+          id?: string
+          referral_count?: number
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string
+          current_level?: number
+          gb_token_balance?: number
+          id?: string
+          referral_count?: number
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       wallet_profiles: {
         Row: {
           created_at: string

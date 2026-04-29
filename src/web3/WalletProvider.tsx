@@ -114,11 +114,19 @@ function captureReferralFromURL(): string | null {
 async function ensureProfileOnServer(wallet: string): Promise<void> {
   try {
     const ref = captureReferralFromURL();
-    await fetch("/api/profile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ walletAddress: wallet, ref: ref ?? undefined }),
-    });
+    await Promise.all([
+      fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: wallet, ref: ref ?? undefined }),
+      }),
+      // Mirror into the RegisteredWallets registry (idempotent).
+      fetch("/api/register-wallet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: wallet }),
+      }),
+    ]);
   } catch (e) {
     console.warn("[wallet] ensureProfileOnServer failed", e);
   }
