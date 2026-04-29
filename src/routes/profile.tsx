@@ -12,6 +12,7 @@ import {
   Sparkles,
   Crown,
   ArrowLeft,
+  Shield,
 } from "lucide-react";
 import { useWallet, shortAddr } from "@/web3/WalletProvider";
 import {
