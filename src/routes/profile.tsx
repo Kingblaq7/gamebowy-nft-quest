@@ -56,6 +56,51 @@ function ProfilePage() {
   const [now, setNow] = useState(Date.now());
   const prevReferralsRef = useRef<number | null>(null);
 
+  // Admin dashboard state
+  type AdminRow = {
+    wallet_address: string;
+    gb_token_balance: number;
+    referral_count: number;
+    current_level: number;
+    created_at: string;
+  };
+  const [adminRows, setAdminRows] = useState<AdminRow[] | null>(null);
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminError, setAdminError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!w.address || !w.isAdmin) {
+      setAdminRows(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setAdminLoading(true);
+      setAdminError(null);
+      try {
+        const res = await fetch("/api/admin/registered-wallets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ walletAddress: w.address }),
+        });
+        const json = (await res.json().catch(() => ({}))) as {
+          wallets?: AdminRow[];
+          error?: string;
+        };
+        if (cancelled) return;
+        if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+        setAdminRows(json.wallets ?? []);
+      } catch (e) {
+        if (!cancelled) setAdminError((e as Error).message);
+      } finally {
+        if (!cancelled) setAdminLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [w.address, w.isAdmin]);
+
   // Tick every minute for the countdown
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 60_000);
