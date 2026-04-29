@@ -163,6 +163,7 @@ export type Database = {
           game_tokens: number
           gb_balance: number
           last_claim_date: string | null
+          referral_code: string | null
           referral_rewards: number
           referral_tokens: number
           referred_by: string | null
@@ -177,6 +178,7 @@ export type Database = {
           game_tokens?: number
           gb_balance?: number
           last_claim_date?: string | null
+          referral_code?: string | null
           referral_rewards?: number
           referral_tokens?: number
           referred_by?: string | null
@@ -191,6 +193,7 @@ export type Database = {
           game_tokens?: number
           gb_balance?: number
           last_claim_date?: string | null
+          referral_code?: string | null
           referral_rewards?: number
           referral_tokens?: number
           referred_by?: string | null
@@ -207,7 +210,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_referral_code: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
