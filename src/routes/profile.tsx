@@ -452,6 +452,79 @@ function ProfilePage() {
           </section>
         )}
 
+        )}
+
+        {/* Admin dashboard — only visible to admin wallets */}
+        {w.address && w.isAdmin && (
+          <section className="mt-5 rounded-3xl border border-stardust/40 bg-card/50 p-5 backdrop-blur-md">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-stardust">
+                <Shield className="h-3.5 w-3.5" /> Admin Dashboard
+              </div>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                {adminRows?.length ?? 0} wallets
+              </span>
+            </div>
+
+            <p className="mt-2 text-xs text-muted-foreground">
+              Registered wallets — GB balance, referrals & current level.
+            </p>
+
+            {adminLoading && (
+              <p className="mt-3 text-sm text-muted-foreground">Loading…</p>
+            )}
+            {adminError && (
+              <p className="mt-3 rounded-lg bg-destructive/10 p-2 text-xs text-destructive">
+                {adminError}
+              </p>
+            )}
+
+            {adminRows && adminRows.length === 0 && !adminLoading && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                No registered wallets yet.
+              </p>
+            )}
+
+            {adminRows && adminRows.length > 0 && (
+              <div className="mt-4 overflow-x-auto rounded-2xl border border-border/40">
+                <table className="w-full text-xs">
+                  <thead className="bg-background/40 text-[10px] uppercase tracking-widest text-muted-foreground">
+                    <tr>
+                      <th className="px-3 py-2 text-left">Wallet</th>
+                      <th className="px-3 py-2 text-right">GB</th>
+                      <th className="px-3 py-2 text-right">Refs</th>
+                      <th className="px-3 py-2 text-right">Lvl</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adminRows.map((r) => (
+                      <tr
+                        key={r.wallet_address}
+                        className="border-t border-border/30 hover:bg-background/30"
+                      >
+                        <td className="px-3 py-2 font-mono">
+                          {shortAddr(r.wallet_address)}
+                        </td>
+                        <td className="px-3 py-2 text-right tabular-nums">
+                          {Number(r.gb_token_balance).toLocaleString(undefined, {
+                            maximumFractionDigits: 3,
+                          })}
+                        </td>
+                        <td className="px-3 py-2 text-right tabular-nums">
+                          {r.referral_count}
+                        </td>
+                        <td className="px-3 py-2 text-right tabular-nums">
+                          {r.current_level}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
         {error && (
           <p className="mt-4 text-center text-xs text-destructive">{error}</p>
         )}
