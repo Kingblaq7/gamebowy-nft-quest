@@ -13,6 +13,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as ApiVerifyTransactionRouteImport } from './routes/api/verify-transaction'
+import { Route as ApiRegisterWalletRouteImport } from './routes/api/register-wallet'
 import { Route as ApiReferralsRouteImport } from './routes/api/referrals'
 import { Route as ApiProfileRouteImport } from './routes/api/profile'
 import { Route as ApiClaimStreakRouteImport } from './routes/api/claim-streak'
@@ -38,6 +39,11 @@ const PlayIndexRoute = PlayIndexRouteImport.update({
 const ApiVerifyTransactionRoute = ApiVerifyTransactionRouteImport.update({
   id: '/api/verify-transaction',
   path: '/api/verify-transaction',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRegisterWalletRoute = ApiRegisterWalletRouteImport.update({
+  id: '/api/register-wallet',
+  path: '/api/register-wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiReferralsRoute = ApiReferralsRouteImport.update({
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/api/claim-streak': typeof ApiClaimStreakRoute
   '/api/profile': typeof ApiProfileRoute
   '/api/referrals': typeof ApiReferralsRoute
+  '/api/register-wallet': typeof ApiRegisterWalletRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/api/claim-streak': typeof ApiClaimStreakRoute
   '/api/profile': typeof ApiProfileRoute
   '/api/referrals': typeof ApiReferralsRoute
+  '/api/register-wallet': typeof ApiRegisterWalletRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play': typeof PlayIndexRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/api/claim-streak': typeof ApiClaimStreakRoute
   '/api/profile': typeof ApiProfileRoute
   '/api/referrals': typeof ApiReferralsRoute
+  '/api/register-wallet': typeof ApiRegisterWalletRoute
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/api/claim-streak'
     | '/api/profile'
     | '/api/referrals'
+    | '/api/register-wallet'
     | '/api/verify-transaction'
     | '/play/'
     | '/play/$chapter/$level'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/api/claim-streak'
     | '/api/profile'
     | '/api/referrals'
+    | '/api/register-wallet'
     | '/api/verify-transaction'
     | '/play'
     | '/play/$chapter/$level'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/api/claim-streak'
     | '/api/profile'
     | '/api/referrals'
+    | '/api/register-wallet'
     | '/api/verify-transaction'
     | '/play/'
     | '/play/$chapter/$level'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   ApiClaimStreakRoute: typeof ApiClaimStreakRoute
   ApiProfileRoute: typeof ApiProfileRoute
   ApiReferralsRoute: typeof ApiReferralsRoute
+  ApiRegisterWalletRoute: typeof ApiRegisterWalletRoute
   ApiVerifyTransactionRoute: typeof ApiVerifyTransactionRoute
   PlayIndexRoute: typeof PlayIndexRoute
   PlayChapterLevelRoute: typeof PlayChapterLevelRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/api/verify-transaction'
       fullPath: '/api/verify-transaction'
       preLoaderRoute: typeof ApiVerifyTransactionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/register-wallet': {
+      id: '/api/register-wallet'
+      path: '/api/register-wallet'
+      fullPath: '/api/register-wallet'
+      preLoaderRoute: typeof ApiRegisterWalletRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/referrals': {
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiClaimStreakRoute: ApiClaimStreakRoute,
   ApiProfileRoute: ApiProfileRoute,
   ApiReferralsRoute: ApiReferralsRoute,
+  ApiRegisterWalletRoute: ApiRegisterWalletRoute,
   ApiVerifyTransactionRoute: ApiVerifyTransactionRoute,
   PlayIndexRoute: PlayIndexRoute,
   PlayChapterLevelRoute: PlayChapterLevelRoute,
