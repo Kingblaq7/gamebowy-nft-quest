@@ -91,6 +91,17 @@ function ProfilePage() {
     }
   };
 
+  const handleCopyCode = async () => {
+    if (!referralCode) return;
+    try {
+      await navigator.clipboard.writeText(referralCode);
+      setCodeCopied(true);
+      window.setTimeout(() => setCodeCopied(false), 1500);
+    } catch {
+      // ignore
+    }
+  };
+
   const handleCopyAddress = async () => {
     if (!w.address) return;
     try {
