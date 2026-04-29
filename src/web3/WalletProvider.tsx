@@ -81,16 +81,28 @@ const LS_ADDR = "gb_wallet_addr";
 const LS_KIND = "gb_wallet_kind";
 const LS_REF = "gb_referrer";
 
-/** Read ?ref=<wallet> from the current URL and persist it (so it survives navigation). */
+/**
+ * Read ?ref=<code|wallet> from the current URL and persist it (so it survives
+ * navigation/wallet connect). Accepts a referral code (preferred) or a raw
+ * wallet address for backward compatibility.
+ */
 function captureReferralFromURL(): string | null {
   if (typeof window === "undefined") return null;
   try {
     const url = new URL(window.location.href);
     const ref = url.searchParams.get("ref");
-    if (ref && /^0x[a-fA-F0-9]{40}$/.test(ref)) {
-      const norm = ref.toLowerCase();
-      localStorage.setItem(LS_REF, norm);
-      return norm;
+    if (ref) {
+      const trimmed = ref.trim();
+      if (/^0x[a-fA-F0-9]{40}$/.test(trimmed)) {
+        const norm = trimmed.toLowerCase();
+        localStorage.setItem(LS_REF, norm);
+        return norm;
+      }
+      if (/^[A-Za-z0-9]{4,10}$/.test(trimmed)) {
+        const norm = trimmed.toUpperCase();
+        localStorage.setItem(LS_REF, norm);
+        return norm;
+      }
     }
   } catch {
     // ignore
