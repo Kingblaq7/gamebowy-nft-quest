@@ -49,6 +49,7 @@ function ProfilePage() {
   const gb = useGbBalance();
   const [gateOpen, setGateOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
   const [addrCopied, setAddrCopied] = useState(false);
   const [claimMsg, setClaimMsg] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
@@ -60,11 +61,12 @@ function ProfilePage() {
     return () => window.clearInterval(id);
   }, []);
 
+  const referralCode = profile?.referral_code ?? "";
   const referralLink = useMemo(() => {
-    if (!w.address || typeof window === "undefined") return "";
-    const base = `${window.location.origin}/`;
-    return `${base}?ref=${w.address.toLowerCase()}`;
-  }, [w.address]);
+    if (typeof window === "undefined") return "";
+    if (!referralCode) return "";
+    return `${window.location.origin}/?ref=${referralCode}`;
+  }, [referralCode]);
 
   const claimedToday = isClaimedToday(profile);
   const nextReward = previewNextReward(profile);
