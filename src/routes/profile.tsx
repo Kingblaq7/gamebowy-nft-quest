@@ -452,7 +452,6 @@ function ProfilePage() {
           </section>
         )}
 
-        )}
 
         {/* Admin dashboard — only visible to admin wallets */}
         {w.address && w.isAdmin && (
