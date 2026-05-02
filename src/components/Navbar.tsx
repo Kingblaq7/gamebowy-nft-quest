@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { Sparkles, User } from "lucide-react";
-import { SoundControl } from "./audio/SoundControl";
 import { PlayButton } from "@/web3/PlayButton";
 import { useWallet, shortAddr } from "@/web3/WalletProvider";
 
@@ -25,7 +24,6 @@ export function Navbar() {
           <a href="#roadmap" className="transition-colors hover:text-foreground">Roadmap</a>
         </nav>
         <div className="flex items-center gap-3">
-          <SoundControl />
           {w.address && (
             <Link
               to="/profile"

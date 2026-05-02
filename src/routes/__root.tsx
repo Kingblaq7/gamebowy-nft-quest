@@ -1,5 +1,4 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { AudioProvider } from "@/components/audio/AudioProvider";
 import { WalletProvider } from "@/web3/WalletProvider";
 
 import appCss from "../styles.css?url";
@@ -76,9 +75,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <WalletProvider>
-      <AudioProvider>
-        <Outlet />
-      </AudioProvider>
+      <Outlet />
     </WalletProvider>
   );
 }

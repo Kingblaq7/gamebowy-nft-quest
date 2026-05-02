@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useAudio } from "./audio/AudioProvider";
 import tileCrystal from "@/assets/tile-crystal.png";
 import tileOrb from "@/assets/tile-orb.png";
 import tileStar from "@/assets/tile-star.png";
@@ -121,7 +120,7 @@ export function GamePreview() {
   const [moves, setMoves] = useState(20);
   const [swapping, setSwapping] = useState<string[] | null>(null);
   const timeoutRef = useRef<number[]>([]);
-  const { playMatch, playSwap, playPowerup } = useAudio();
+  
 
   const clearTimers = useCallback(() => {
     timeoutRef.current.forEach((t) => window.clearTimeout(t));
@@ -136,7 +135,6 @@ export function GamePreview() {
       }
       const [r1, c1, r2, c2] = swap;
       setSwapping([`${r1}-${c1}`, `${r2}-${c2}`]);
-      playSwap();
       const next = current.map((row) => row.map((c) => ({ ...c })));
       [next[r1][c1], next[r2][c2]] = [next[r2][c2], next[r1][c1]];
 
@@ -148,7 +146,7 @@ export function GamePreview() {
       );
       return current;
     });
-  }, [playSwap]);
+  }, []);
 
   const resolveMatches = useCallback((b: Board, chain: number) => {
     const matches = findMatches(b);
@@ -157,11 +155,6 @@ export function GamePreview() {
       setCombo(0);
       timeoutRef.current.push(window.setTimeout(tick, 700));
       return;
-    }
-    if (matches.size >= 5 || chain >= 2) {
-      playPowerup();
-    } else {
-      playMatch(chain);
     }
     const marked = b.map((row, r) =>
       row.map((cell, c) => ({ ...cell, matched: matches.has(`${r}-${c}`) }))
@@ -180,7 +173,7 @@ export function GamePreview() {
         );
       }, 500)
     );
-  }, [tick, playMatch, playPowerup]);
+  }, [tick]);
 
   // refill moves so demo never ends
   useEffect(() => {

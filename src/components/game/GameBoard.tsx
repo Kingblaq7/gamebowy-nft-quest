@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Coins, Pause, RotateCcw, Sparkles, Star, Trophy, X, Zap } from "lucide-react";
 import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@/game/chapters";
-import { useAudio } from "@/components/audio/AudioProvider";
 import { usePlayer } from "@/game/usePlayer";
 import { useWallet } from "@/web3/WalletProvider";
 import { useGbBalance } from "@/game/useGbBalance";
@@ -110,13 +109,6 @@ type GameState = "playing" | "won" | "lost" | "outOfMoves";
 
 export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
-  const { playMatch, playSwap, playPowerup, setTrack } = useAudio();
-
-  // Per-chapter music: start on mount, stop on unmount (no music outside the game)
-  useEffect(() => {
-    setTrack(chapter.num);
-    return () => setTrack(null);
-  }, [chapter.num, setTrack]);
   const { submitLevel, profile } = usePlayer();
   const wallet = useWallet();
   const gb = useGbBalance();
@@ -203,9 +195,7 @@ export function GameBoard({ chapter, level }: Props) {
       if (matches.size === 0) {
         return { board: current, gained: 0 };
       }
-      // sound
-      if (matches.size >= 5 || chain >= 2) playPowerup();
-      else playMatch(chain);
+
 
       // tally collected by type
       const typeCounts: Record<number, number> = {};
@@ -244,7 +234,7 @@ export function GameBoard({ chapter, level }: Props) {
       const next = await resolveMatches(collapsed, chain + 1);
       return { board: next.board, gained: gained + next.gained };
     },
-    [playMatch, playPowerup, level.tilePool, showPopup]
+    [level.tilePool, showPopup]
   );
 
   const trySwap = useCallback(
@@ -257,7 +247,7 @@ export function GameBoard({ chapter, level }: Props) {
       setBusy(true);
       const next = board.map((row) => row.map((c) => ({ ...c })));
       [next[r1][c1], next[r2][c2]] = [next[r2][c2], next[r1][c1]];
-      playSwap();
+      
       setBoard(next);
       await new Promise((res) => window.setTimeout(res, 220));
 
@@ -291,7 +281,7 @@ export function GameBoard({ chapter, level }: Props) {
       }
       setBusy(false);
     },
-    [board, busy, state, paused, resolveMatches, playSwap, level.tilePool]
+    [board, busy, state, paused, resolveMatches, level.tilePool]
   );
 
   // Drag handlers
