@@ -249,7 +249,7 @@ export function GameBoard({ chapter, level }: Props) {
       setBusy(true);
       const next = board.map((row) => row.map((c) => ({ ...c })));
       [next[r1][c1], next[r2][c2]] = [next[r2][c2], next[r1][c1]];
-      
+      playSwap();
       setBoard(next);
       await new Promise((res) => window.setTimeout(res, 220));
 
@@ -283,7 +283,7 @@ export function GameBoard({ chapter, level }: Props) {
       }
       setBusy(false);
     },
-    [board, busy, state, paused, resolveMatches, level.tilePool]
+    [board, busy, state, paused, resolveMatches, level.tilePool, playSwap]
   );
 
   // Drag handlers
