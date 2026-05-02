@@ -163,29 +163,20 @@ function ProfilePage() {
     setClaimMsg(null);
     const r = await claim();
     if (r.ok) {
-      if (r.reward && r.reward > 0) gb.add(r.reward);
+      // Server has already credited gb_balance in wallet_profiles.
+      // useGbBalance is subscribed to realtime updates and will refresh.
       setClaimMsg(`+${r.reward?.toFixed(3)} GB claimed 🎉`);
     } else {
       setClaimMsg(r.error ?? "Claim failed");
     }
   };
 
-  // Credit the local balance when new referral rewards arrive from backend.
+  // Referral rewards are credited server-side in /api/profile.
+  // The realtime subscription in useGbBalance keeps the UI in sync — no
+  // local credit needed here.
   useEffect(() => {
-    const count = referrals?.count ?? null;
-    if (count === null) return;
-    if (prevReferralsRef.current === null) {
-      prevReferralsRef.current = count;
-      return;
-    }
-    if (count > prevReferralsRef.current) {
-      const newRefs = count - prevReferralsRef.current;
-      gb.add(newRefs * 10);
-      prevReferralsRef.current = count;
-    } else {
-      prevReferralsRef.current = count;
-    }
-  }, [referrals?.count, gb]);
+    prevReferralsRef.current = referrals?.count ?? null;
+  }, [referrals?.count]);
 
   return (
     <main
