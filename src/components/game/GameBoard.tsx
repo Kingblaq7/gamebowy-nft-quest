@@ -5,6 +5,7 @@ import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@
 import { usePlayer } from "@/game/usePlayer";
 import { useWallet } from "@/web3/WalletProvider";
 import { useGbBalance } from "@/game/useGbBalance";
+import { useSwapSound } from "@/game/useSwapSound";
 
 const COMBO_THRESHOLD = 30; // points in single move > this = combo
 const COMBO_BONUS_MOVES = 2;
@@ -112,6 +113,7 @@ export function GameBoard({ chapter, level }: Props) {
   const { submitLevel, profile } = usePlayer();
   const wallet = useWallet();
   const gb = useGbBalance();
+  const playSwap = useSwapSound();
 
   const [board, setBoard] = useState<Board>(() => makeBoard(level.size, level.tilePool));
   const [score, setScore] = useState(0);
@@ -247,7 +249,7 @@ export function GameBoard({ chapter, level }: Props) {
       setBusy(true);
       const next = board.map((row) => row.map((c) => ({ ...c })));
       [next[r1][c1], next[r2][c2]] = [next[r2][c2], next[r1][c1]];
-      
+      playSwap();
       setBoard(next);
       await new Promise((res) => window.setTimeout(res, 220));
 
@@ -281,7 +283,7 @@ export function GameBoard({ chapter, level }: Props) {
       }
       setBusy(false);
     },
-    [board, busy, state, paused, resolveMatches, level.tilePool]
+    [board, busy, state, paused, resolveMatches, level.tilePool, playSwap]
   );
 
   // Drag handlers
