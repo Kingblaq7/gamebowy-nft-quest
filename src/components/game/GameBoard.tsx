@@ -358,21 +358,37 @@ export function GameBoard({ chapter, level }: Props) {
     setBuyError(null);
     setBuying(true);
     try {
-      const ok = gb.spend(BUY_COST_GB);
-      if (!ok) {
-        setBuyError(`Not enough GB tokens. You have ${gb.balance} GB.`);
+      if (!wallet.address) {
+        setBuyError("Connect your wallet to buy moves.");
         return;
       }
-      setMovesLeft((m) => m + BUY_MOVES_AMOUNT);
+      const res = await fetch("/api/buy-moves", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress: wallet.address.toLowerCase() }),
+      });
+      const json = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        balance?: number;
+        movesGranted?: number;
+        error?: string;
+      };
+      if (!json.ok) {
+        setBuyError(json.error ?? "Purchase failed");
+        if (typeof json.balance === "number") gb.setFromServer(json.balance);
+        return;
+      }
+      if (typeof json.balance === "number") gb.setFromServer(json.balance);
+      setMovesLeft((m) => m + (json.movesGranted ?? BUY_MOVES_AMOUNT));
       setState("playing");
-      setComboFlash(`+${BUY_MOVES_AMOUNT} Moves!`);
+      setComboFlash(`+${json.movesGranted ?? BUY_MOVES_AMOUNT} Moves!`);
       window.setTimeout(() => setComboFlash(null), 1400);
     } catch (e) {
       setBuyError((e as Error).message ?? "Purchase failed");
     } finally {
       setBuying(false);
     }
-  }, [gb]);
+  }, [gb, wallet.address]);
 
   const stars = computeStars(score);
 
