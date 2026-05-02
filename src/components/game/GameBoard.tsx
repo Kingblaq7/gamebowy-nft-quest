@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Coins, Pause, RotateCcw, Sparkles, Star, Trophy, X, Zap } from "lucide-react";
 import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@/game/chapters";
-import { useAudio } from "@/components/audio/AudioProvider";
 import { usePlayer } from "@/game/usePlayer";
 import { useWallet } from "@/web3/WalletProvider";
 import { useGbBalance } from "@/game/useGbBalance";
@@ -110,13 +109,6 @@ type GameState = "playing" | "won" | "lost" | "outOfMoves";
 
 export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
-  const { playMatch, playSwap, playPowerup, setTrack } = useAudio();
-
-  // Per-chapter music: start on mount, stop on unmount (no music outside the game)
-  useEffect(() => {
-    setTrack(chapter.num);
-    return () => setTrack(null);
-  }, [chapter.num, setTrack]);
   const { submitLevel, profile } = usePlayer();
   const wallet = useWallet();
   const gb = useGbBalance();
