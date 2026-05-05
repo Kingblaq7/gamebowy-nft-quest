@@ -1,0 +1,32 @@
+{
+  "appId": "xyz.gamebowy.app",
+  "appName": "Gamebowy",
+  "webDir": "www",
+  "server": {
+    "url": "https://www.gamebowy.xyz",
+    "cleartext": false,
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#0b1f12",
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "launchAutoHide": true,
+      "backgroundColor": "#0b1f12",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0b1f12",
+      "overlaysWebView": true
+    }
+  }
+}
