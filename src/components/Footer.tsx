@@ -1,4 +1,5 @@
 import { Sparkles, Send } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export function Footer() {
   return (
@@ -39,10 +40,12 @@ export function Footer() {
         <p className="text-xs text-muted-foreground">
           © {new Date().getFullYear()} Game Bowy · Match the cosmos
         </p>
-        <div className="flex gap-6 text-xs text-muted-foreground">
+        <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
           <a href="#play" className="transition-colors hover:text-foreground">Play</a>
           <a href="#chapters" className="transition-colors hover:text-foreground">Chapters</a>
           <a href="#roadmap" className="transition-colors hover:text-foreground">Roadmap</a>
+          <Link to="/privacy" className="transition-colors hover:text-foreground">Privacy</Link>
+          <Link to="/terms" className="transition-colors hover:text-foreground">Terms</Link>
         </div>
       </div>
     </footer>
