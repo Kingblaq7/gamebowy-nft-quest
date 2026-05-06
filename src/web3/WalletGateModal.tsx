@@ -141,19 +141,38 @@ export function WalletGateModal({ open, onClose, onUnlocked }: Props) {
         <div className="mt-5">
           {step === "choose" && (
             <div className="grid gap-3">
+              <label className="flex cursor-pointer items-start gap-2 rounded-2xl border border-border/40 bg-background/40 p-3 text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={tosAccepted}
+                  onChange={(e) => setTosAccepted(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
+                />
+                <span>
+                  I have read and agree to the{" "}
+                  <a href="/terms" target="_blank" rel="noreferrer" className="font-semibold text-foreground underline">
+                    Terms of Service
+                  </a>{" "}
+                  and{" "}
+                  <a href="/privacy" target="_blank" rel="noreferrer" className="font-semibold text-foreground underline">
+                    Privacy Policy
+                  </a>
+                  . I understand GB rewards have no guaranteed monetary value.
+                </span>
+              </label>
               <WalletOption
                 label="MetaMask"
                 installed={w.isInstalled("metamask")}
                 onClick={() => handleConnect("metamask")}
                 installUrl="https://metamask.io/download/"
-                disabled={w.connecting}
+                disabled={w.connecting || !tosAccepted}
               />
               <WalletOption
                 label="Rabby Wallet"
                 installed={w.isInstalled("rabby")}
                 onClick={() => handleConnect("rabby")}
                 installUrl="https://rabby.io/"
-                disabled={w.connecting}
+                disabled={w.connecting || !tosAccepted}
               />
               {w.connecting && (
                 <p className="text-center text-xs text-muted-foreground">
