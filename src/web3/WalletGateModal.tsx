@@ -3,6 +3,8 @@ import { Loader2, ShieldCheck, Wallet, X, AlertTriangle, ExternalLink } from "lu
 import { useWallet, shortAddr, type WalletKind } from "./WalletProvider";
 import { ABEY_CHAIN_ID_DEC, GAME_TREASURY_ADDRESS, REQUIRED_PAYMENT_ABEY } from "./abey";
 
+const LS_TOS_ACCEPTED = "gb_tos_accepted_v1";
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -13,6 +15,15 @@ export function WalletGateModal({ open, onClose, onUnlocked }: Props) {
   const w = useWallet();
   const [step, setStep] = useState<"choose" | "network" | "balance" | "pay" | "done">("choose");
   const [localError, setLocalError] = useState<string | null>(null);
+  const [tosAccepted, setTosAccepted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(LS_TOS_ACCEPTED) === "1";
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (tosAccepted) localStorage.setItem(LS_TOS_ACCEPTED, "1");
+  }, [tosAccepted]);
 
   // Advance steps based on wallet state
   useEffect(() => {
@@ -42,6 +53,10 @@ export function WalletGateModal({ open, onClose, onUnlocked }: Props) {
 
   const handleConnect = async (kind: WalletKind) => {
     setLocalError(null);
+    if (!tosAccepted) {
+      setLocalError("Please accept the Terms of Service to continue.");
+      return;
+    }
     const ok = await w.connect(kind);
     if (!ok) return;
     // After connect, ensure network
