@@ -483,25 +483,21 @@ export function GameBoard({ chapter, level }: Props) {
         </div>
       )}
 
-      {/* Out of moves overlay (offer to buy) */}
+      {/* Out of moves overlay (offer to buy with $ABEY) */}
       {state === "outOfMoves" && (
         <Overlay>
-          <Zap className="h-10 w-10 text-stardust" style={{ filter: "drop-shadow(0 0 16px currentColor)" }} />
+          <Zap className="h-10 w-10 text-[#39FF14]" style={{ filter: "drop-shadow(0 0 16px currentColor)" }} />
           <h2 className="font-display text-3xl font-black">Out of Moves</h2>
           <p className="text-center text-sm text-muted-foreground">
-            Score: {score.toLocaleString()} · Keep going by buying more moves with GB tokens.
-          </p>
-          <p className="text-center text-xs text-muted-foreground">
-            Balance: <span className="font-bold text-stardust">{gb.balance} GB</span>
+            Score: {score.toLocaleString()} · Buy more moves with $ABEY to keep going.
           </p>
           <button
             type="button"
-            onClick={() => void buyMoves()}
-            disabled={buying || gb.balance < BUY_COST_GB}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-aurora px-5 py-3 font-bold text-background disabled:opacity-60"
+            onClick={() => setShowBuyModal(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#39FF14] px-5 py-3 font-display font-black uppercase tracking-wider text-black shadow-[0_0_30px_-5px_#39FF14]"
           >
-            <Coins className="h-4 w-4" />
-            {buying ? "Processing…" : `Buy ${BUY_MOVES_AMOUNT} Moves (${BUY_COST_GB} GB)`}
+            <Zap className="h-4 w-4" />
+            Buy Moves with $ABEY
           </button>
           {buyError && (
             <p className="text-center text-xs text-destructive">{buyError}</p>
@@ -524,6 +520,12 @@ export function GameBoard({ chapter, level }: Props) {
           </div>
         </Overlay>
       )}
+
+      <PremiumMovesModal
+        open={showBuyModal}
+        onClose={() => setShowBuyModal(false)}
+        onPurchased={(added) => handleMovesPurchased(added)}
+      />
 
       {/* Pause overlay */}
       {paused && state === "playing" && (
