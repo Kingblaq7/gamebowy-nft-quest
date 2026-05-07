@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Coins, Pause, RotateCcw, Sparkles, Star, Trophy, X, Zap } from "lucide-react";
+import { ArrowLeft, Pause, RotateCcw, Sparkles, Star, Trophy, X, Zap } from "lucide-react";
 import { TILE_TYPES, type LevelDef, type ChapterDef, describeObjective } from "@/game/chapters";
 import { usePlayer } from "@/game/usePlayer";
 import { useWallet } from "@/web3/WalletProvider";
-import { useGbBalance } from "@/game/useGbBalance";
 import { useSwapSound } from "@/game/useSwapSound";
+import { PremiumMovesModal } from "@/components/game/PremiumMovesModal";
 
 const COMBO_THRESHOLD = 30; // points in single move > this = combo
 const COMBO_BONUS_MOVES = 2;
-const BUY_COST_GB = 10;
-const BUY_MOVES_AMOUNT = 30;
 
 type Cell = { type: number; key: number; matched?: boolean };
 type Board = Cell[][];
@@ -112,7 +110,6 @@ export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
   const { submitLevel, profile } = usePlayer();
   const wallet = useWallet();
-  const gb = useGbBalance();
   const playSwap = useSwapSound();
 
   const [board, setBoard] = useState<Board>(() => makeBoard(level.size, level.tilePool));
@@ -125,8 +122,8 @@ export function GameBoard({ chapter, level }: Props) {
   const [lastChain, setLastChain] = useState(0);
   const [paused, setPaused] = useState(false);
   const [comboFlash, setComboFlash] = useState<string | null>(null);
-  const [buying, setBuying] = useState(false);
   const [buyError, setBuyError] = useState<string | null>(null);
+  const [showBuyModal, setShowBuyModal] = useState(false);
   const submittedRef = useRef(false);
 
   // Floating score popups
@@ -167,10 +164,9 @@ export function GameBoard({ chapter, level }: Props) {
       const stars = won ? Math.max(1, computeStars(finalScore)) : computeStars(finalScore);
       const tokens = won ? level.reward.tokens : 0;
       setState(won ? "won" : "lost");
-      if (tokens > 0) await gb.add(tokens);
       await submitLevel(chapter.num, level.num, finalScore, stars, won, tokens);
     },
-    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel, gb]
+    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel]
   );
 
   // After moves run out, decide outcome
@@ -346,41 +342,12 @@ export function GameBoard({ chapter, level }: Props) {
     void finishLevel(false, score);
   }, [finishLevel, score]);
 
-  const buyMoves = useCallback(async () => {
-    setBuyError(null);
-    setBuying(true);
-    try {
-      if (!wallet.address) {
-        setBuyError("Connect your wallet to buy moves.");
-        return;
-      }
-      const res = await fetch("/api/buy-moves", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: wallet.address.toLowerCase() }),
-      });
-      const json = (await res.json().catch(() => ({}))) as {
-        ok?: boolean;
-        balance?: number;
-        movesGranted?: number;
-        error?: string;
-      };
-      if (!json.ok) {
-        setBuyError(json.error ?? "Purchase failed");
-        if (typeof json.balance === "number") gb.setFromServer(json.balance);
-        return;
-      }
-      if (typeof json.balance === "number") gb.setFromServer(json.balance);
-      setMovesLeft((m) => m + (json.movesGranted ?? BUY_MOVES_AMOUNT));
-      setState("playing");
-      setComboFlash(`+${json.movesGranted ?? BUY_MOVES_AMOUNT} Moves!`);
-      window.setTimeout(() => setComboFlash(null), 1400);
-    } catch (e) {
-      setBuyError((e as Error).message ?? "Purchase failed");
-    } finally {
-      setBuying(false);
-    }
-  }, [gb, wallet.address]);
+  const handleMovesPurchased = useCallback((added: number) => {
+    setMovesLeft((m) => m + added);
+    setState("playing");
+    setComboFlash(`+${added} Moves!`);
+    window.setTimeout(() => setComboFlash(null), 1400);
+  }, []);
 
   const stars = computeStars(score);
 
@@ -516,25 +483,21 @@ export function GameBoard({ chapter, level }: Props) {
         </div>
       )}
 
-      {/* Out of moves overlay (offer to buy) */}
+      {/* Out of moves overlay (offer to buy with $ABEY) */}
       {state === "outOfMoves" && (
         <Overlay>
-          <Zap className="h-10 w-10 text-stardust" style={{ filter: "drop-shadow(0 0 16px currentColor)" }} />
+          <Zap className="h-10 w-10 text-[#39FF14]" style={{ filter: "drop-shadow(0 0 16px currentColor)" }} />
           <h2 className="font-display text-3xl font-black">Out of Moves</h2>
           <p className="text-center text-sm text-muted-foreground">
-            Score: {score.toLocaleString()} · Keep going by buying more moves with GB tokens.
-          </p>
-          <p className="text-center text-xs text-muted-foreground">
-            Balance: <span className="font-bold text-stardust">{gb.balance} GB</span>
+            Score: {score.toLocaleString()} · Buy more moves with $ABEY to keep going.
           </p>
           <button
             type="button"
-            onClick={() => void buyMoves()}
-            disabled={buying || gb.balance < BUY_COST_GB}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-aurora px-5 py-3 font-bold text-background disabled:opacity-60"
+            onClick={() => setShowBuyModal(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#39FF14] px-5 py-3 font-display font-black uppercase tracking-wider text-black shadow-[0_0_30px_-5px_#39FF14]"
           >
-            <Coins className="h-4 w-4" />
-            {buying ? "Processing…" : `Buy ${BUY_MOVES_AMOUNT} Moves (${BUY_COST_GB} GB)`}
+            <Zap className="h-4 w-4" />
+            Buy Moves with $ABEY
           </button>
           {buyError && (
             <p className="text-center text-xs text-destructive">{buyError}</p>
@@ -557,6 +520,12 @@ export function GameBoard({ chapter, level }: Props) {
           </div>
         </Overlay>
       )}
+
+      <PremiumMovesModal
+        open={showBuyModal}
+        onClose={() => setShowBuyModal(false)}
+        onPurchased={(added) => handleMovesPurchased(added)}
+      />
 
       {/* Pause overlay */}
       {paused && state === "playing" && (

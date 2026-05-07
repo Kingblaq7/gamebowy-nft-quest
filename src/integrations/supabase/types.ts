@@ -85,6 +85,33 @@ export type Database = {
         }
         Relationships: []
       }
+      move_purchases: {
+        Row: {
+          amount_wei: string
+          chain_id: number
+          created_at: string
+          moves_purchased: number
+          tx_hash: string
+          wallet_address: string
+        }
+        Insert: {
+          amount_wei: string
+          chain_id: number
+          created_at?: string
+          moves_purchased: number
+          tx_hash: string
+          wallet_address: string
+        }
+        Update: {
+          amount_wei?: string
+          chain_id?: number
+          created_at?: string
+          moves_purchased?: number
+          tx_hash?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       paid_wallets: {
         Row: {
           amount_wei: string
@@ -182,6 +209,24 @@ export type Database = {
           gb_token_balance?: number
           id?: string
           referral_count?: number
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
+      user_move_balance: {
+        Row: {
+          moves_balance: number
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          moves_balance?: number
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          moves_balance?: number
           updated_at?: string
           wallet_address?: string
         }
