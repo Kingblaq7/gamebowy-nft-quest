@@ -164,10 +164,9 @@ export function GameBoard({ chapter, level }: Props) {
       const stars = won ? Math.max(1, computeStars(finalScore)) : computeStars(finalScore);
       const tokens = won ? level.reward.tokens : 0;
       setState(won ? "won" : "lost");
-      if (tokens > 0) await gb.add(tokens);
       await submitLevel(chapter.num, level.num, finalScore, stars, won, tokens);
     },
-    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel, gb]
+    [chapter.num, level.num, level.reward.tokens, computeStars, submitLevel]
   );
 
   // After moves run out, decide outcome
