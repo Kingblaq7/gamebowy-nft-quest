@@ -342,41 +342,12 @@ export function GameBoard({ chapter, level }: Props) {
     void finishLevel(false, score);
   }, [finishLevel, score]);
 
-  const buyMoves = useCallback(async () => {
-    setBuyError(null);
-    setBuying(true);
-    try {
-      if (!wallet.address) {
-        setBuyError("Connect your wallet to buy moves.");
-        return;
-      }
-      const res = await fetch("/api/buy-moves", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: wallet.address.toLowerCase() }),
-      });
-      const json = (await res.json().catch(() => ({}))) as {
-        ok?: boolean;
-        balance?: number;
-        movesGranted?: number;
-        error?: string;
-      };
-      if (!json.ok) {
-        setBuyError(json.error ?? "Purchase failed");
-        if (typeof json.balance === "number") gb.setFromServer(json.balance);
-        return;
-      }
-      if (typeof json.balance === "number") gb.setFromServer(json.balance);
-      setMovesLeft((m) => m + (json.movesGranted ?? BUY_MOVES_AMOUNT));
-      setState("playing");
-      setComboFlash(`+${json.movesGranted ?? BUY_MOVES_AMOUNT} Moves!`);
-      window.setTimeout(() => setComboFlash(null), 1400);
-    } catch (e) {
-      setBuyError((e as Error).message ?? "Purchase failed");
-    } finally {
-      setBuying(false);
-    }
-  }, [gb, wallet.address]);
+  const handleMovesPurchased = useCallback((added: number) => {
+    setMovesLeft((m) => m + added);
+    setState("playing");
+    setComboFlash(`+${added} Moves!`);
+    window.setTimeout(() => setComboFlash(null), 1400);
+  }, []);
 
   const stars = computeStars(score);
 
