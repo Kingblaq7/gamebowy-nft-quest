@@ -122,8 +122,8 @@ export function GameBoard({ chapter, level }: Props) {
   const [lastChain, setLastChain] = useState(0);
   const [paused, setPaused] = useState(false);
   const [comboFlash, setComboFlash] = useState<string | null>(null);
-  const [buying, setBuying] = useState(false);
   const [buyError, setBuyError] = useState<string | null>(null);
+  const [showBuyModal, setShowBuyModal] = useState(false);
   const submittedRef = useRef(false);
 
   // Floating score popups
