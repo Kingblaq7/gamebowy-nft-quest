@@ -110,7 +110,6 @@ export function GameBoard({ chapter, level }: Props) {
   const navigate = useNavigate();
   const { submitLevel, profile } = usePlayer();
   const wallet = useWallet();
-  const gb = useGbBalance();
   const playSwap = useSwapSound();
 
   const [board, setBoard] = useState<Board>(() => makeBoard(level.size, level.tilePool));
