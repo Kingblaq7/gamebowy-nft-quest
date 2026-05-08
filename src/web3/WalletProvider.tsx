@@ -310,6 +310,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setError(null);
     localStorage.removeItem(LS_ADDR);
     localStorage.removeItem(LS_KIND);
+    void import("./siwe").then((m) => m.siweSignOut());
   }, []);
 
   const payToPlay = useCallback(async (): Promise<{ ok: true } | { ok: false; reason: string }> => {
