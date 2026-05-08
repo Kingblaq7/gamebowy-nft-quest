@@ -200,11 +200,23 @@ export function PremiumMovesModal({ open, onClose, onPurchased }: Props) {
         </div>
 
         {/* Live total */}
-        <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-          <span className="text-xs uppercase tracking-widest text-white/60">Total</span>
-          <span className="font-display text-2xl font-black text-[#39FF14]">
-            {totalAbey} <span className="text-sm text-white/70">ABEY</span>
-          </span>
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs uppercase tracking-widest text-white/60">Total</span>
+            <span className="font-display text-2xl font-black text-[#39FF14]">
+              {totalAbey} <span className="text-sm text-white/70">ABEY</span>
+            </span>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-2 text-[10px] uppercase tracking-wider">
+            <div className="rounded-lg border border-white/10 bg-black/40 px-2 py-1.5">
+              <div className="text-white/40">Treasury</div>
+              <div className="text-[#39FF14]">30% · {(totalAbey * 0.3).toFixed(2)}</div>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-black/40 px-2 py-1.5">
+              <div className="text-white/40">Burn</div>
+              <div className="text-[#39FF14]">70% · {(totalAbey * 0.7).toFixed(2)}</div>
+            </div>
+          </div>
         </div>
 
         {/* Notices */}
