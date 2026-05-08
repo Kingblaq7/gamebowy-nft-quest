@@ -44,6 +44,13 @@ export const Route = createFileRoute("/api/claim-streak")({
               { status: 400 },
             );
           }
+          try {
+            requireSessionWallet(wallet);
+          } catch (e) {
+            if (e instanceof HttpError)
+              return Response.json({ error: e.message }, { status: e.status });
+            throw e;
+          }
 
           // Ensure profile exists
           const { data: existing } = await supabaseAdmin
