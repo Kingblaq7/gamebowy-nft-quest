@@ -17,6 +17,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { JsonRpcProvider, formatEther, getAddress, parseEther } from "ethers";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { HttpError, requireSessionWallet } from "@/lib/siwe.server";
 import {
   ABEY_PER_MOVE,
   MAX_MOVES,
@@ -66,6 +67,13 @@ export const Route = createFileRoute("/api/buy-moves")({
           parsed = Body.parse(await request.json());
         } catch {
           return json(400, { ok: false, error: "Invalid request body" });
+        }
+
+        try {
+          requireSessionWallet(parsed.walletAddress);
+        } catch (e) {
+          if (e instanceof HttpError) return json(e.status, { ok: false, error: e.message });
+          throw e;
         }
 
         const wallet = parsed.walletAddress;

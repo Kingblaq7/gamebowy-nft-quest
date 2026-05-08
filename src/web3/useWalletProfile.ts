@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 export type WalletProfile = {
   wallet_address: string;
@@ -54,17 +53,22 @@ export function useWalletProfile(walletAddress: string | null) {
     setLoading(true);
     setError(null);
     try {
-      // Read profile directly from DB (public SELECT policy).
-      const { data: prof } = await supabase
-        .from("wallet_profiles")
-        .select("*")
-        .eq("wallet_address", wallet)
-        .maybeSingle();
-      if (prof) setProfile(prof as unknown as WalletProfile);
-      else {
-        // Backfill via API (also handles referral param)
+      // Read profile via SIWE-protected server endpoint.
+      const profRes = await fetch(
+        `/api/wallet/profile?walletAddress=${encodeURIComponent(wallet)}`,
+        { credentials: "include" },
+      );
+      const profJson = (await profRes.json().catch(() => ({}))) as {
+        profile?: WalletProfile | null;
+      };
+      if (profJson.profile) {
+        setProfile(profJson.profile);
+      } else {
+        // Backfill via API (also handles referral param). This endpoint also
+        // returns the profile.
         const res = await fetch("/api/profile", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ walletAddress: wallet }),
         });
@@ -76,6 +80,7 @@ export function useWalletProfile(walletAddress: string | null) {
 
       const refRes = await fetch("/api/referrals", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ walletAddress: wallet }),
       });
@@ -104,6 +109,7 @@ export function useWalletProfile(walletAddress: string | null) {
     try {
       const res = await fetch("/api/claim-streak", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ walletAddress: walletAddress.toLowerCase() }),
       });

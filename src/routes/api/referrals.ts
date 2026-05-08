@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { HttpError, requireSessionWallet } from "@/lib/siwe.server";
 
 const WALLET_RE = /^0x[a-f0-9]{40}$/;
 
@@ -25,6 +26,13 @@ export const Route = createFileRoute("/api/referrals")({
               { error: "Invalid wallet address" },
               { status: 400 },
             );
+          }
+          try {
+            requireSessionWallet(wallet);
+          } catch (e) {
+            if (e instanceof HttpError)
+              return Response.json({ error: e.message }, { status: e.status });
+            throw e;
           }
 
           const { data: rows, error } = await supabaseAdmin

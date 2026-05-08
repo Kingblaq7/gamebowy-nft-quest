@@ -117,12 +117,14 @@ async function ensureProfileOnServer(wallet: string): Promise<void> {
     await Promise.all([
       fetch("/api/profile", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ walletAddress: wallet, ref: ref ?? undefined }),
       }),
       // Mirror into the RegisteredWallets registry (idempotent).
       fetch("/api/register-wallet", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ walletAddress: wallet }),
       }),
@@ -276,6 +278,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const cid = (await eip.request({ method: "eth_chainId" })) as string;
       setChainId(parseInt(cid, 16));
 
+      // Prompt SIWE signature first so the server session is established
+      // before profile/registration calls run.
+      const { siweSignIn } = await import("./siwe");
+      const signRes = await siweSignIn(eip as never, addr);
+      if (!signRes.ok) {
+        setError(signRes.error ?? "Wallet sign-in required");
+        return false;
+      }
+
       await Promise.all([
         checkPaidStatus(addr),
         checkRole(addr),
@@ -301,6 +312,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setError(null);
     localStorage.removeItem(LS_ADDR);
     localStorage.removeItem(LS_KIND);
+    void import("./siwe").then((m) => m.siweSignOut());
   }, []);
 
   const payToPlay = useCallback(async (): Promise<{ ok: true } | { ok: false; reason: string }> => {
@@ -395,6 +407,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       try {
         const accounts = (await eip.request({ method: "eth_accounts" })) as string[];
         if (accounts?.length && accounts[0].toLowerCase() === savedAddr.toLowerCase()) {
+          // Verify server session is still valid for this wallet. If not,
+          // require re-signing on next gated action.
+          const { checkServerSession } = await import("./siwe");
+          const sessionWallet = await checkServerSession();
+          if (sessionWallet?.toLowerCase() !== accounts[0].toLowerCase()) {
+            // Session expired or wallet changed — drop persisted state.
+            localStorage.removeItem(LS_ADDR);
+            localStorage.removeItem(LS_KIND);
+            return;
+          }
           setKind(savedKind);
           setAddress(accounts[0]);
           const cid = (await eip.request({ method: "eth_chainId" })) as string;

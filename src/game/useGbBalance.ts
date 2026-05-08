@@ -1,21 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useWallet } from "@/web3/WalletProvider";
 
 /**
- * GB balance hook — Supabase is the source of truth.
+ * GB balance hook — server is the source of truth.
  *
- * Behavior:
- * - On mount / wallet change: fetch authoritative balance from Supabase and
- *   override any cached value.
- * - localStorage is used purely as a per-wallet read-through cache so the UI
- *   shows a number instantly on cold load before the network round-trip.
- * - `add(n)` writes to Supabase first via /api/award-tokens, then updates
- *   local state and cache with the server-returned balance.
- * - `spend(n)` is best-effort optimistic for callers that have already
- *   debited server-side (e.g. /api/buy-moves returns the new balance — use
- *   `setFromServer(balance)` instead). Returns false if cached balance is
- *   insufficient. Real authorization happens on the server.
+ * Reads come from /api/wallet/profile (SIWE-protected, owner-only). Local
+ * storage is used purely as a per-wallet cache so the UI renders a number
+ * instantly on cold load before the network round-trip completes.
+ *
+ * Mutations: this hook intentionally does NOT expose a client `add()`
+ * function — token credits MUST happen server-side (e.g. /api/claim-streak,
+ * /api/profile referral path). Use `setFromServer(balance)` after a server
+ * response, or `refresh()` to re-pull from the server.
  *
  * If no wallet is connected, the hook falls back to a local-only mode so the
  * game UI still works for guests.
@@ -50,6 +46,25 @@ function writeCache(wallet: string | null, n: number) {
   window.dispatchEvent(new CustomEvent(EVENT));
 }
 
+async function fetchServerBalance(wallet: string): Promise<number | null> {
+  try {
+    const res = await fetch(
+      `/api/wallet/profile?walletAddress=${encodeURIComponent(wallet)}`,
+      { credentials: "include" },
+    );
+    if (!res.ok) return null;
+    const json = (await res.json().catch(() => ({}))) as {
+      profile?: { gb_balance?: number } | null;
+    };
+    if (json.profile && typeof json.profile.gb_balance !== "undefined") {
+      return Number(json.profile.gb_balance);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function useGbBalance() {
   const wallet = useWallet();
   const address = wallet.address ? wallet.address.toLowerCase() : null;
@@ -69,108 +84,21 @@ export function useGbBalance() {
     };
   }, []);
 
-  // On wallet change, immediately reflect cached value, then fetch authoritative.
+  // On wallet change, immediately reflect cached value, then fetch server.
   useEffect(() => {
     setBalance(readCache(address));
     if (!address) return;
     let cancelled = false;
     (async () => {
-      try {
-        const { data } = await supabase
-          .from("wallet_profiles")
-          .select("gb_balance")
-          .eq("wallet_address", address)
-          .maybeSingle();
-        if (cancelled) return;
-        if (data && typeof data.gb_balance !== "undefined") {
-          const next = Number(data.gb_balance);
-          writeCache(address, next);
-          setBalance(next);
-        } else {
-          // No row yet — backfill via API (also handles ?ref= referral linking)
-          const res = await fetch("/api/profile", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ walletAddress: address }),
-          });
-          const json = (await res.json().catch(() => ({}))) as {
-            profile?: { gb_balance?: number };
-          };
-          if (cancelled) return;
-          const next = Number(json.profile?.gb_balance ?? 0);
-          writeCache(address, next);
-          setBalance(next);
-        }
-      } catch (e) {
-        console.warn("[useGbBalance] fetch failed", e);
-      }
+      const next = await fetchServerBalance(address);
+      if (cancelled || next === null) return;
+      writeCache(address, next);
+      setBalance(next);
     })();
     return () => {
       cancelled = true;
     };
   }, [address]);
-
-  // Realtime subscription so other tabs / server-side updates flow in.
-  useEffect(() => {
-    if (!address) return;
-    const channel = supabase
-      .channel(`wallet_profiles:${address}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "wallet_profiles",
-          filter: `wallet_address=eq.${address}`,
-        },
-        (payload) => {
-          const next = Number(
-            (payload.new as { gb_balance?: number })?.gb_balance ?? 0,
-          );
-          writeCache(address, next);
-          setBalance(next);
-        },
-      )
-      .subscribe();
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [address]);
-
-  /** Server-authoritative credit. Writes to Supabase first, then updates cache. */
-  const add = useCallback(
-    async (amount: number): Promise<number> => {
-      if (amount <= 0) return balance;
-      const addr = addressRef.current;
-      if (!addr) {
-        // Guest mode: local-only
-        const next = Math.max(0, readCache(null) + amount);
-        writeCache(null, next);
-        setBalance(next);
-        return next;
-      }
-      try {
-        const res = await fetch("/api/award-tokens", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ walletAddress: addr, amount, reason: "gameplay" }),
-        });
-        const json = (await res.json().catch(() => ({}))) as {
-          ok?: boolean;
-          balance?: number;
-        };
-        if (json.ok && typeof json.balance === "number") {
-          writeCache(addr, json.balance);
-          setBalance(json.balance);
-          return json.balance;
-        }
-      } catch (e) {
-        console.warn("[useGbBalance.add] server credit failed", e);
-      }
-      return balance;
-    },
-    [balance],
-  );
 
   /**
    * Update local state/cache from a server response that already mutated
@@ -182,25 +110,31 @@ export function useGbBalance() {
     setBalance(next);
   }, []);
 
+  const refresh = useCallback(async () => {
+    const addr = addressRef.current;
+    if (!addr) return;
+    const next = await fetchServerBalance(addr);
+    if (next === null) return;
+    writeCache(addr, next);
+    setBalance(next);
+  }, []);
+
   /**
    * Optimistic spend check using the cached value. Real authorization is
    * server-side — callers should follow up with the appropriate API and
    * call `setFromServer(serverBalance)` with the returned value.
    */
-  const spend = useCallback(
-    (amount: number): boolean => {
-      const addr = addressRef.current;
-      const current = readCache(addr);
-      if (current < amount) return false;
-      if (!addr) {
-        const next = current - amount;
-        writeCache(null, next);
-        setBalance(next);
-      }
-      return true;
-    },
-    [],
-  );
+  const spend = useCallback((amount: number): boolean => {
+    const addr = addressRef.current;
+    const current = readCache(addr);
+    if (current < amount) return false;
+    if (!addr) {
+      const next = current - amount;
+      writeCache(null, next);
+      setBalance(next);
+    }
+    return true;
+  }, []);
 
-  return { balance, add, spend, setFromServer };
+  return { balance, spend, setFromServer, refresh };
 }

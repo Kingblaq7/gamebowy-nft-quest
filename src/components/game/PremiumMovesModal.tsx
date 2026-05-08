@@ -88,6 +88,7 @@ export function PremiumMovesModal({ open, onClose, onPurchased }: Props) {
       setStatus("verifying");
       const res = await fetch("/api/buy-moves", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           walletAddress: wallet.address.toLowerCase(),
