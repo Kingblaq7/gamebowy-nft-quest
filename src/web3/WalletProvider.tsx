@@ -117,12 +117,14 @@ async function ensureProfileOnServer(wallet: string): Promise<void> {
     await Promise.all([
       fetch("/api/profile", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ walletAddress: wallet, ref: ref ?? undefined }),
       }),
       // Mirror into the RegisteredWallets registry (idempotent).
       fetch("/api/register-wallet", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ walletAddress: wallet }),
       }),
