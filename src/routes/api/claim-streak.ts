@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { HttpError, requireSessionWallet } from "@/lib/siwe.server";
 
 const WALLET_RE = /^0x[a-f0-9]{40}$/;
 
