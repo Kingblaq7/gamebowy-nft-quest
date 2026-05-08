@@ -109,6 +109,7 @@ export function useWalletProfile(walletAddress: string | null) {
     try {
       const res = await fetch("/api/claim-streak", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ walletAddress: walletAddress.toLowerCase() }),
       });
