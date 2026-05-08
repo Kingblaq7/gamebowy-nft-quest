@@ -13,31 +13,23 @@ export const ABEY_PER_MOVE = 2; // 1 move = 2 $ABEY
 export const MIN_MOVES = 1;
 export const MAX_MOVES = 200;
 
-// TODO: replace with the deployed Buy-Moves contract address.
+// Deployed Buy-Moves contract on Abey Mainnet (chain id 179).
+// Contract internally splits payment: 30% treasury / 70% burn.
 export const MOVES_CONTRACT_ADDRESS =
-  "0x0000000000000000000000000000000000000000";
+  "0x2878c0FF014B4119Dd772415bd97ECD01F1C5eaf";
 
-// TODO: replace with the final ABI. Expected to expose a payable
-// function `buyMoves(uint256 quantity)` that emits a `MovesPurchased` event.
-// The current minimal stub lets the dApp encode the call as soon as the
-// real ABI is dropped in.
+// Treasury / burn split is enforced inside the contract.
+export const TREASURY_PCT = 30;
+export const BURN_PCT = 70;
+
+// Minimal ABI matching the deployed contract.
 export const MOVES_CONTRACT_ABI = [
   {
-    inputs: [{ internalType: "uint256", name: "quantity", type: "uint256" }],
+    inputs: [{ internalType: "uint256", name: "moveAmount", type: "uint256" }],
     name: "buyMoves",
     outputs: [],
     stateMutability: "payable",
     type: "function",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, internalType: "address", name: "player", type: "address" },
-      { indexed: false, internalType: "uint256", name: "quantity", type: "uint256" },
-      { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
-    ],
-    name: "MovesPurchased",
-    type: "event",
   },
 ] as const;
 
