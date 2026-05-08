@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { readSessionWallet } from "@/lib/siwe.server";
 
 const WALLET_RE = /^0x[a-f0-9]{40}$/;
 const CODE_RE = /^[A-HJ-NP-Z2-9]{4,10}$/; // referral code format
@@ -90,8 +91,13 @@ export const Route = createFileRoute("/api/profile")({
           let profile = await ensureProfile(wallet);
           const referrerWallet = await resolveReferrer(body.ref);
 
-          // Apply referral if eligible (not self, no existing referrer)
+          // Referral credit requires the caller to have proven wallet ownership
+          // via SIWE — otherwise it can be farmed with offline-generated wallets.
+          const sessionWallet = readSessionWallet();
+          const refereeAuthed = sessionWallet === wallet;
+
           if (
+            refereeAuthed &&
             referrerWallet &&
             referrerWallet !== wallet &&
             !profile.referred_by
