@@ -53,13 +53,6 @@ export type Database = {
             foreignKeyName: "level_progress_player_id_fkey"
             columns: ["player_id"]
             isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "level_progress_player_id_fkey"
-            columns: ["player_id"]
-            isOneToOne: false
             referencedRelation: "players"
             referencedColumns: ["id"]
           },
@@ -313,30 +306,7 @@ export type Database = {
       }
     }
     Views: {
-      leaderboard: {
-        Row: {
-          created_at: string | null
-          display_name: string | null
-          id: string | null
-          total_score: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          display_name?: string | null
-          id?: string | null
-          total_score?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          display_name?: string | null
-          id?: string | null
-          total_score?: number | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       generate_referral_code: { Args: never; Returns: string }
