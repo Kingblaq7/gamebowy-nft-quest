@@ -405,6 +405,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       try {
         const accounts = (await eip.request({ method: "eth_accounts" })) as string[];
         if (accounts?.length && accounts[0].toLowerCase() === savedAddr.toLowerCase()) {
+          // Verify server session is still valid for this wallet. If not,
+          // require re-signing on next gated action.
+          const { checkServerSession } = await import("./siwe");
+          const sessionWallet = await checkServerSession();
+          if (sessionWallet?.toLowerCase() !== accounts[0].toLowerCase()) {
+            // Session expired or wallet changed — drop persisted state.
+            localStorage.removeItem(LS_ADDR);
+            localStorage.removeItem(LS_KIND);
+            return;
+          }
           setKind(savedKind);
           setAddress(accounts[0]);
           const cid = (await eip.request({ method: "eth_chainId" })) as string;
