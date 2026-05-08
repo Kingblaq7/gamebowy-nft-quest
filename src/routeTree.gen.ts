@@ -24,6 +24,10 @@ import { Route as ApiCheckAccessRouteImport } from './routes/api/check-access'
 import { Route as ApiBuyMovesRouteImport } from './routes/api/buy-moves'
 import { Route as ApiAwardTokensRouteImport } from './routes/api/award-tokens'
 import { Route as PlayChapterLevelRouteImport } from './routes/play.$chapter.$level'
+import { Route as ApiAuthVerifyRouteImport } from './routes/api/auth.verify'
+import { Route as ApiAuthSessionRouteImport } from './routes/api/auth.session'
+import { Route as ApiAuthNonceRouteImport } from './routes/api/auth.nonce'
+import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth.logout'
 import { Route as ApiAdminRegisteredWalletsRouteImport } from './routes/api/admin/registered-wallets'
 
 const TermsRoute = TermsRouteImport.update({
@@ -101,6 +105,26 @@ const PlayChapterLevelRoute = PlayChapterLevelRouteImport.update({
   path: '/play/$chapter/$level',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthVerifyRoute = ApiAuthVerifyRouteImport.update({
+  id: '/api/auth/verify',
+  path: '/api/auth/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSessionRoute = ApiAuthSessionRouteImport.update({
+  id: '/api/auth/session',
+  path: '/api/auth/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthNonceRoute = ApiAuthNonceRouteImport.update({
+  id: '/api/auth/nonce',
+  path: '/api/auth/nonce',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
+  id: '/api/auth/logout',
+  path: '/api/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminRegisteredWalletsRoute =
   ApiAdminRegisteredWalletsRouteImport.update({
     id: '/api/admin/registered-wallets',
@@ -124,6 +148,10 @@ export interface FileRoutesByFullPath {
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
   '/api/admin/registered-wallets': typeof ApiAdminRegisteredWalletsRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/nonce': typeof ApiAuthNonceRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/verify': typeof ApiAuthVerifyRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesByTo {
@@ -142,6 +170,10 @@ export interface FileRoutesByTo {
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play': typeof PlayIndexRoute
   '/api/admin/registered-wallets': typeof ApiAdminRegisteredWalletsRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/nonce': typeof ApiAuthNonceRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/verify': typeof ApiAuthVerifyRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesById {
@@ -161,6 +193,10 @@ export interface FileRoutesById {
   '/api/verify-transaction': typeof ApiVerifyTransactionRoute
   '/play/': typeof PlayIndexRoute
   '/api/admin/registered-wallets': typeof ApiAdminRegisteredWalletsRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/nonce': typeof ApiAuthNonceRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/verify': typeof ApiAuthVerifyRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRouteTypes {
@@ -181,6 +217,10 @@ export interface FileRouteTypes {
     | '/api/verify-transaction'
     | '/play/'
     | '/api/admin/registered-wallets'
+    | '/api/auth/logout'
+    | '/api/auth/nonce'
+    | '/api/auth/session'
+    | '/api/auth/verify'
     | '/play/$chapter/$level'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -199,6 +239,10 @@ export interface FileRouteTypes {
     | '/api/verify-transaction'
     | '/play'
     | '/api/admin/registered-wallets'
+    | '/api/auth/logout'
+    | '/api/auth/nonce'
+    | '/api/auth/session'
+    | '/api/auth/verify'
     | '/play/$chapter/$level'
   id:
     | '__root__'
@@ -217,6 +261,10 @@ export interface FileRouteTypes {
     | '/api/verify-transaction'
     | '/play/'
     | '/api/admin/registered-wallets'
+    | '/api/auth/logout'
+    | '/api/auth/nonce'
+    | '/api/auth/session'
+    | '/api/auth/verify'
     | '/play/$chapter/$level'
   fileRoutesById: FileRoutesById
 }
@@ -236,6 +284,10 @@ export interface RootRouteChildren {
   ApiVerifyTransactionRoute: typeof ApiVerifyTransactionRoute
   PlayIndexRoute: typeof PlayIndexRoute
   ApiAdminRegisteredWalletsRoute: typeof ApiAdminRegisteredWalletsRoute
+  ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthNonceRoute: typeof ApiAuthNonceRoute
+  ApiAuthSessionRoute: typeof ApiAuthSessionRoute
+  ApiAuthVerifyRoute: typeof ApiAuthVerifyRoute
   PlayChapterLevelRoute: typeof PlayChapterLevelRoute
 }
 
@@ -346,6 +398,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayChapterLevelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/verify': {
+      id: '/api/auth/verify'
+      path: '/api/auth/verify'
+      fullPath: '/api/auth/verify'
+      preLoaderRoute: typeof ApiAuthVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/session': {
+      id: '/api/auth/session'
+      path: '/api/auth/session'
+      fullPath: '/api/auth/session'
+      preLoaderRoute: typeof ApiAuthSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/nonce': {
+      id: '/api/auth/nonce'
+      path: '/api/auth/nonce'
+      fullPath: '/api/auth/nonce'
+      preLoaderRoute: typeof ApiAuthNonceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/logout': {
+      id: '/api/auth/logout'
+      path: '/api/auth/logout'
+      fullPath: '/api/auth/logout'
+      preLoaderRoute: typeof ApiAuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/registered-wallets': {
       id: '/api/admin/registered-wallets'
       path: '/api/admin/registered-wallets'
@@ -372,8 +452,21 @@ const rootRouteChildren: RootRouteChildren = {
   ApiVerifyTransactionRoute: ApiVerifyTransactionRoute,
   PlayIndexRoute: PlayIndexRoute,
   ApiAdminRegisteredWalletsRoute: ApiAdminRegisteredWalletsRoute,
+  ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthNonceRoute: ApiAuthNonceRoute,
+  ApiAuthSessionRoute: ApiAuthSessionRoute,
+  ApiAuthVerifyRoute: ApiAuthVerifyRoute,
   PlayChapterLevelRoute: PlayChapterLevelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
