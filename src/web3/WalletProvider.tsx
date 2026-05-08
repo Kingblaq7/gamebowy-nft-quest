@@ -276,6 +276,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const cid = (await eip.request({ method: "eth_chainId" })) as string;
       setChainId(parseInt(cid, 16));
 
+      // Prompt SIWE signature first so the server session is established
+      // before profile/registration calls run.
+      const { siweSignIn } = await import("./siwe");
+      const signRes = await siweSignIn(eip as never, addr);
+      if (!signRes.ok) {
+        setError(signRes.error ?? "Wallet sign-in required");
+        return false;
+      }
+
       await Promise.all([
         checkPaidStatus(addr),
         checkRole(addr),
