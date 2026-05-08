@@ -22,8 +22,9 @@ import { Route as ApiProfileRouteImport } from './routes/api/profile'
 import { Route as ApiClaimStreakRouteImport } from './routes/api/claim-streak'
 import { Route as ApiCheckAccessRouteImport } from './routes/api/check-access'
 import { Route as ApiBuyMovesRouteImport } from './routes/api/buy-moves'
-import { Route as ApiAwardTokensRouteImport } from './routes/api/award-tokens'
 import { Route as PlayChapterLevelRouteImport } from './routes/play.$chapter.$level'
+import { Route as ApiWalletProfileRouteImport } from './routes/api/wallet.profile'
+import { Route as ApiWalletMovesRouteImport } from './routes/api/wallet.moves'
 import { Route as ApiAuthVerifyRouteImport } from './routes/api/auth.verify'
 import { Route as ApiAuthSessionRouteImport } from './routes/api/auth.session'
 import { Route as ApiAuthNonceRouteImport } from './routes/api/auth.nonce'
@@ -95,14 +96,19 @@ const ApiBuyMovesRoute = ApiBuyMovesRouteImport.update({
   path: '/api/buy-moves',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAwardTokensRoute = ApiAwardTokensRouteImport.update({
-  id: '/api/award-tokens',
-  path: '/api/award-tokens',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PlayChapterLevelRoute = PlayChapterLevelRouteImport.update({
   id: '/play/$chapter/$level',
   path: '/play/$chapter/$level',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWalletProfileRoute = ApiWalletProfileRouteImport.update({
+  id: '/api/wallet/profile',
+  path: '/api/wallet/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWalletMovesRoute = ApiWalletMovesRouteImport.update({
+  id: '/api/wallet/moves',
+  path: '/api/wallet/moves',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthVerifyRoute = ApiAuthVerifyRouteImport.update({
@@ -138,7 +144,6 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
-  '/api/award-tokens': typeof ApiAwardTokensRoute
   '/api/buy-moves': typeof ApiBuyMovesRoute
   '/api/check-access': typeof ApiCheckAccessRoute
   '/api/claim-streak': typeof ApiClaimStreakRoute
@@ -152,6 +157,8 @@ export interface FileRoutesByFullPath {
   '/api/auth/nonce': typeof ApiAuthNonceRoute
   '/api/auth/session': typeof ApiAuthSessionRoute
   '/api/auth/verify': typeof ApiAuthVerifyRoute
+  '/api/wallet/moves': typeof ApiWalletMovesRoute
+  '/api/wallet/profile': typeof ApiWalletProfileRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesByTo {
@@ -160,7 +167,6 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
-  '/api/award-tokens': typeof ApiAwardTokensRoute
   '/api/buy-moves': typeof ApiBuyMovesRoute
   '/api/check-access': typeof ApiCheckAccessRoute
   '/api/claim-streak': typeof ApiClaimStreakRoute
@@ -174,6 +180,8 @@ export interface FileRoutesByTo {
   '/api/auth/nonce': typeof ApiAuthNonceRoute
   '/api/auth/session': typeof ApiAuthSessionRoute
   '/api/auth/verify': typeof ApiAuthVerifyRoute
+  '/api/wallet/moves': typeof ApiWalletMovesRoute
+  '/api/wallet/profile': typeof ApiWalletProfileRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRoutesById {
@@ -183,7 +191,6 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
-  '/api/award-tokens': typeof ApiAwardTokensRoute
   '/api/buy-moves': typeof ApiBuyMovesRoute
   '/api/check-access': typeof ApiCheckAccessRoute
   '/api/claim-streak': typeof ApiClaimStreakRoute
@@ -197,6 +204,8 @@ export interface FileRoutesById {
   '/api/auth/nonce': typeof ApiAuthNonceRoute
   '/api/auth/session': typeof ApiAuthSessionRoute
   '/api/auth/verify': typeof ApiAuthVerifyRoute
+  '/api/wallet/moves': typeof ApiWalletMovesRoute
+  '/api/wallet/profile': typeof ApiWalletProfileRoute
   '/play/$chapter/$level': typeof PlayChapterLevelRoute
 }
 export interface FileRouteTypes {
@@ -207,7 +216,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/terms'
-    | '/api/award-tokens'
     | '/api/buy-moves'
     | '/api/check-access'
     | '/api/claim-streak'
@@ -221,6 +229,8 @@ export interface FileRouteTypes {
     | '/api/auth/nonce'
     | '/api/auth/session'
     | '/api/auth/verify'
+    | '/api/wallet/moves'
+    | '/api/wallet/profile'
     | '/play/$chapter/$level'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -229,7 +239,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/terms'
-    | '/api/award-tokens'
     | '/api/buy-moves'
     | '/api/check-access'
     | '/api/claim-streak'
@@ -243,6 +252,8 @@ export interface FileRouteTypes {
     | '/api/auth/nonce'
     | '/api/auth/session'
     | '/api/auth/verify'
+    | '/api/wallet/moves'
+    | '/api/wallet/profile'
     | '/play/$chapter/$level'
   id:
     | '__root__'
@@ -251,7 +262,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/terms'
-    | '/api/award-tokens'
     | '/api/buy-moves'
     | '/api/check-access'
     | '/api/claim-streak'
@@ -265,6 +275,8 @@ export interface FileRouteTypes {
     | '/api/auth/nonce'
     | '/api/auth/session'
     | '/api/auth/verify'
+    | '/api/wallet/moves'
+    | '/api/wallet/profile'
     | '/play/$chapter/$level'
   fileRoutesById: FileRoutesById
 }
@@ -274,7 +286,6 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   TermsRoute: typeof TermsRoute
-  ApiAwardTokensRoute: typeof ApiAwardTokensRoute
   ApiBuyMovesRoute: typeof ApiBuyMovesRoute
   ApiCheckAccessRoute: typeof ApiCheckAccessRoute
   ApiClaimStreakRoute: typeof ApiClaimStreakRoute
@@ -288,6 +299,8 @@ export interface RootRouteChildren {
   ApiAuthNonceRoute: typeof ApiAuthNonceRoute
   ApiAuthSessionRoute: typeof ApiAuthSessionRoute
   ApiAuthVerifyRoute: typeof ApiAuthVerifyRoute
+  ApiWalletMovesRoute: typeof ApiWalletMovesRoute
+  ApiWalletProfileRoute: typeof ApiWalletProfileRoute
   PlayChapterLevelRoute: typeof PlayChapterLevelRoute
 }
 
@@ -384,18 +397,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBuyMovesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/award-tokens': {
-      id: '/api/award-tokens'
-      path: '/api/award-tokens'
-      fullPath: '/api/award-tokens'
-      preLoaderRoute: typeof ApiAwardTokensRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/play/$chapter/$level': {
       id: '/play/$chapter/$level'
       path: '/play/$chapter/$level'
       fullPath: '/play/$chapter/$level'
       preLoaderRoute: typeof PlayChapterLevelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wallet/profile': {
+      id: '/api/wallet/profile'
+      path: '/api/wallet/profile'
+      fullPath: '/api/wallet/profile'
+      preLoaderRoute: typeof ApiWalletProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wallet/moves': {
+      id: '/api/wallet/moves'
+      path: '/api/wallet/moves'
+      fullPath: '/api/wallet/moves'
+      preLoaderRoute: typeof ApiWalletMovesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/verify': {
@@ -442,7 +462,6 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   TermsRoute: TermsRoute,
-  ApiAwardTokensRoute: ApiAwardTokensRoute,
   ApiBuyMovesRoute: ApiBuyMovesRoute,
   ApiCheckAccessRoute: ApiCheckAccessRoute,
   ApiClaimStreakRoute: ApiClaimStreakRoute,
@@ -456,8 +475,19 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthNonceRoute: ApiAuthNonceRoute,
   ApiAuthSessionRoute: ApiAuthSessionRoute,
   ApiAuthVerifyRoute: ApiAuthVerifyRoute,
+  ApiWalletMovesRoute: ApiWalletMovesRoute,
+  ApiWalletProfileRoute: ApiWalletProfileRoute,
   PlayChapterLevelRoute: PlayChapterLevelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
