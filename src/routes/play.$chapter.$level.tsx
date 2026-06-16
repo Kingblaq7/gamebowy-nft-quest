@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { GameBoard } from "@/components/game/GameBoard";
 import { getLevel } from "@/game/chapters";
 import { RequirePaidWallet } from "@/web3/RequirePaidWallet";
+import { Footer } from "@/components/Footer";
 
 export const Route = createFileRoute("/play/$chapter/$level")({
   loader: ({ params }) => {
@@ -43,8 +44,11 @@ export const Route = createFileRoute("/play/$chapter/$level")({
 function PlayLevel() {
   const { chapter, level } = Route.useLoaderData();
   return (
-    <RequirePaidWallet>
-      <GameBoard chapter={chapter} level={level} />
-    </RequirePaidWallet>
+    <>
+      <RequirePaidWallet>
+        <GameBoard chapter={chapter} level={level} />
+      </RequirePaidWallet>
+      <Footer />
+    </>
   );
 }

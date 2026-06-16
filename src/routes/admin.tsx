@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useWallet, shortAddr } from "@/web3/WalletProvider";
+import { Footer } from "@/components/Footer";
 
 type Row = {
   wallet_address: string;
@@ -99,6 +100,7 @@ function AdminPage() {
         <Link to="/" className="text-sm text-primary underline">
           Back to home
         </Link>
+        <Footer />
       </div>
     );
   }
@@ -176,6 +178,7 @@ function AdminPage() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }
