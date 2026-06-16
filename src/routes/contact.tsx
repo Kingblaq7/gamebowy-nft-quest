@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Mail, Send, Twitter, ArrowLeft } from "lucide-react";
+import { Footer } from "@/components/Footer";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -77,6 +78,7 @@ function ContactPage() {
           happen in your wallet with explicit confirmation.
         </p>
       </div>
+      <Footer />
     </main>
   );
 }

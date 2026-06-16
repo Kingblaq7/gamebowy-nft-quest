@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   Shield,
 } from "lucide-react";
+import { Footer } from "@/components/Footer";
 import { useWallet, shortAddr } from "@/web3/WalletProvider";
 import {
   useWalletProfile,
@@ -533,6 +534,7 @@ function ProfilePage() {
       </div>
 
       <WalletGateModal open={gateOpen} onClose={() => setGateOpen(false)} />
+      <Footer />
     </main>
   );
 }
