@@ -41,6 +41,18 @@ export const ensurePlayer = createServerFn({ method: "POST" })
     return created;
   });
 
+export const getPlayerProgress = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({ player_id: z.string().regex(UUID_RE) }).parse,
+  )
+  .handler(async ({ data }) => {
+    const { data: rows } = await supabaseAdmin
+      .from("level_progress")
+      .select("chapter_num, level_num, best_score, stars, completed, plays")
+      .eq("player_id", data.player_id);
+    return rows ?? [];
+  });
+
 export const updatePlayerName = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
