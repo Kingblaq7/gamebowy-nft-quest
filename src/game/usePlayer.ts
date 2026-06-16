@@ -4,7 +4,7 @@ import {
   ensurePlayer,
   submitLevelResult,
   updatePlayerName,
-} from "@/server/players.functions";
+} from "@/lib/players.functions";
 
 const PLAYER_ID_KEY = "gb_player_id";
 const PLAYER_NAME_KEY = "gb_player_name";
