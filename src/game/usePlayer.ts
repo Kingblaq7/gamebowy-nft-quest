@@ -80,10 +80,7 @@ export function usePlayer() {
   const refresh = useCallback(async () => {
     const p = await bootstrapPlayer();
     setProfile(p);
-    const { data } = await supabase
-      .from("level_progress")
-      .select("chapter_num, level_num, best_score, stars, completed, plays")
-      .eq("player_id", p.id);
+    const data = await getPlayerProgress({ data: { player_id: p.id } });
     if (data) {
       const map: ProgressMap = {};
       for (const row of data) map[progressKey(row.chapter_num, row.level_num)] = row as LevelProgressRow;
