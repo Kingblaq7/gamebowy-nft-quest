@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import {
   ensurePlayer,
+  getPlayerProgress,
   submitLevelResult,
   updatePlayerName,
 } from "@/lib/players.functions";
