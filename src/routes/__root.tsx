@@ -30,6 +30,12 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      // Security / privacy hardening (browser-enforceable via meta)
+      { name: "referrer", content: "strict-origin-when-cross-origin" },
+      { httpEquiv: "Content-Security-Policy", content: "frame-ancestors 'self'" },
+      { httpEquiv: "X-Content-Type-Options", content: "nosniff" },
+      { name: "permissions-policy", content: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+      { name: "robots", content: "index,follow" },
       { title: "Game Bowy" },
       { name: "description", content: "Play Game Bowy and earn GB tokens. Invite friends and climb the leaderboard." },
       { name: "author", content: "Game Bowy" },

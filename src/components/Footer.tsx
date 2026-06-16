@@ -46,6 +46,7 @@ export function Footer() {
           <a href="#roadmap" className="transition-colors hover:text-foreground">Roadmap</a>
           <Link to="/privacy" className="transition-colors hover:text-foreground">Privacy</Link>
           <Link to="/terms" className="transition-colors hover:text-foreground">Terms</Link>
+          <Link to="/contact" className="transition-colors hover:text-foreground">Contact</Link>
         </div>
       </div>
     </footer>
